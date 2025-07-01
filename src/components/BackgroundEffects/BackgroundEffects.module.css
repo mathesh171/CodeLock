@@ -1,0 +1,56 @@
+.backgroundContainer {
+  position: absolute;
+  inset: 0;
+}
+
+.starsContainer {
+  position: absolute;
+  inset: 0;
+}
+
+.particlesContainer {
+  position: absolute;
+  inset: 0;
+}
+
+.star {
+  position: absolute;
+  width: 0.25rem;
+  height: 0.25rem;
+  background-color: white;
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+.particle {
+  position: absolute;
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: #60a5fa;
+  border-radius: 50%;
+  opacity: 0.2;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.1);
+  }
+}
