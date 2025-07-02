@@ -1,0 +1,54 @@
+.circleTopLeft {
+  position: absolute;
+  top: 5rem;
+  left: 5rem;
+  width: 8rem;
+  height: 8rem;
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  border-radius: 50%;
+}
+
+.circleBottomRight {
+  position: absolute;
+  bottom: 5rem;
+  right: 5rem;
+  width: 6rem;
+  height: 6rem;
+  border: 1px solid rgba(196, 181, 253, 0.2);
+  border-radius: 50%;
+}
+
+.dotLeft {
+  position: absolute;
+  top: 50%;
+  left: 2.5rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: #22d3ee;
+  border-radius: 50%;
+  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.dotRight {
+  position: absolute;
+  top: 33.333333%;
+  right: 4rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: #a855f7;
+  border-radius: 50%;
+}
+
+.gradientOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom right, rgba(88, 28, 135, 0.1), transparent, rgba(14, 116, 144, 0.1));
+  pointer-events: none;
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
