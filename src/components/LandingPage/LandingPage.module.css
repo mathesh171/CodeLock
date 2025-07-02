@@ -20,7 +20,7 @@ html, body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(135deg, #0c1426 0%, #1e2a47 25%, #2d3a5f 50%, #1e2a47 75%, #0c1426 100%);
+  background: linear-gradient(135deg, #030508 0%, #0a0f1a 25%, #0f1525 50%, #0a0f1a 75%, #050a10 100%);
   background-size: 400% 400%;
   animation: gradientShift 15s ease infinite;
   overflow: hidden;
@@ -39,9 +39,22 @@ html, body {
   padding: 2rem 1rem;
 }
 
-.logoSection {
+.title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1050px;
+  margin-left: 85px;
   margin-bottom: 4rem;
   animation: fadeInUp 1s ease-out 0.2s both;
+}
+
+.logoSection {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0;
 }
 
 .titleSection {
@@ -60,7 +73,7 @@ html, body {
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+  /* text-shadow: 3px 3px 10px rgba(255, 255, 255, 0.3); */
 }
 
 .secondaryTitle {
@@ -222,8 +235,13 @@ html, body {
     padding: 1rem;
   }
   
-  .logoSection {
+  .title {
     margin-bottom: 3rem;
+    padding: 0 0.5rem;
+  }
+  
+  .logoSection {
+    margin-bottom: 0;
   }
   
   .titleSection {
@@ -233,6 +251,19 @@ html, body {
   .decorativeCircle1,
   .decorativeCircle2 {
     opacity: 0.7;
+  }
+}
+
+/* Additional responsive breakpoints for logo and text scaling */
+@media (max-width: 600px) {
+  .title {
+    padding: 0 0.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    padding: 0;
   }
 }
 

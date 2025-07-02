@@ -1,20 +1,26 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'
 import LandingPage from '../components/LandingPage/LandingPage.jsx';
 
 const Home = () => {
+  const navigate = useNavigate();
+
   const handleCreateChallenge = () => {
-    console.log('Create Challenge clicked');
-    // Add your create challenge logic here
+    navigate('/create-room');
   };
 
   const handleJoinChallenge = () => {
-    console.log('Join Challenge clicked');
-    // Add your join challenge logic here
+    navigate('/join-room');
+  };
+
+  const handleLogin = () => {
+    navigate('/login');
   };
 
   return (
     <div>
       <LandingPage 
+        onLogin={handleLogin}
         onCreateChallenge={handleCreateChallenge}
         onJoinChallenge={handleJoinChallenge}
       />

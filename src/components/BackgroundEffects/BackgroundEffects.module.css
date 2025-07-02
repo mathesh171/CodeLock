@@ -2,6 +2,56 @@
   position: absolute;
   inset: 0;
 }
+.starsContainer {
+  position: absolute;
+  inset: 0;
+}
+.particlesContainer {
+  position: absolute;
+  inset: 0;
+}
+.star {
+  position: absolute;
+  width: 0.25rem;
+  height: 0.25rem;
+  background-color: white;
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: twinkle 3s ease-in-out infinite;
+}
+.particle {
+  position: absolute;
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: #0f172a;
+  border-radius: 50%;
+  opacity: 0.2;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.1);
+  }
+}.backgroundContainer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
 
 .starsContainer {
   position: absolute;
@@ -20,17 +70,50 @@
   background-color: white;
   border-radius: 50%;
   opacity: 0.6;
-  animation: twinkle 3s ease-in-out infinite;
+  animation: twinkle 3s ease-in-out infinite, starFloat 8s linear infinite;
 }
 
 .particle {
   position: absolute;
   width: 0.5rem;
   height: 0.5rem;
-  background-color: #60a5fa;
+  background-color: #0f172a;
   border-radius: 50%;
   opacity: 0.2;
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite, particleFloat 6s linear infinite;
+}
+
+/* Variations for random directions */
+.star:nth-child(2n) {
+  animation: twinkle 3.2s ease-in-out infinite, starFloat1 9s linear infinite;
+}
+
+.star:nth-child(3n) {
+  animation: twinkle 2.8s ease-in-out infinite, starFloat2 7s linear infinite;
+}
+
+.star:nth-child(4n) {
+  animation: twinkle 3.5s ease-in-out infinite, starFloat3 10s linear infinite;
+}
+
+.star:nth-child(5n) {
+  animation: twinkle 2.6s ease-in-out infinite, starFloat4 8.5s linear infinite;
+}
+
+.particle:nth-child(2n) {
+  animation: pulse 2.3s cubic-bezier(0.4, 0, 0.6, 1) infinite, particleFloat1 7s linear infinite;
+}
+
+.particle:nth-child(3n) {
+  animation: pulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite, particleFloat2 5.5s linear infinite;
+}
+
+.particle:nth-child(4n) {
+  animation: pulse 2.1s cubic-bezier(0.4, 0, 0.6, 1) infinite, particleFloat3 8s linear infinite;
+}
+
+.particle:nth-child(5n) {
+  animation: pulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite, particleFloat4 6.2s linear infinite;
 }
 
 @keyframes twinkle {
@@ -52,5 +135,97 @@
   50% {
     opacity: 0.4;
     transform: scale(1.1);
+  }
+}
+
+/* Star movement animations - various directions */
+@keyframes starFloat {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate(20px, -30px) rotate(360deg);
+  }
+}
+
+@keyframes starFloat1 {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate(-25px, 15px) rotate(-360deg);
+  }
+}
+
+@keyframes starFloat2 {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate(15px, 25px) rotate(180deg);
+  }
+}
+
+@keyframes starFloat3 {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate(-18px, -20px) rotate(270deg);
+  }
+}
+
+@keyframes starFloat4 {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate(30px, 10px) rotate(450deg);
+  }
+}
+
+/* Particle movement animations - various directions */
+@keyframes particleFloat {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate(-15px, 25px) rotate(180deg);
+  }
+}
+
+@keyframes particleFloat1 {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate(22px, -18px) rotate(-270deg);
+  }
+}
+
+@keyframes particleFloat2 {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate(-28px, -12px) rotate(360deg);
+  }
+}
+
+@keyframes particleFloat3 {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate(12px, 32px) rotate(-180deg);
+  }
+}
+
+@keyframes particleFloat4 {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate(-20px, 8px) rotate(540deg);
   }
 }
