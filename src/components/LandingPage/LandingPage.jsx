@@ -17,7 +17,7 @@ const LandingPage = ({ onCreateChallenge, onJoinChallenge, onLogin}) => {
             <Logo responsive={true} />
           </div>
 
-          <div>
+          <div >
             <Button
               onClick={onLogin}
               variant='ternary'
