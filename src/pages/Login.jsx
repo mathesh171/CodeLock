@@ -23,7 +23,8 @@ const Login = ({ onLoginSuccess }) => {
   const validateEmail = (email) => {
     return email.includes('@');
   };
-
+  const LOGIN_API_URL = 'http://localhost:8084/api/auth/login';
+  const SIGN_API_URL = 'http://localhost:8084/api/auth/register';
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     
@@ -46,94 +47,122 @@ const Login = ({ onLoginSuccess }) => {
 
     setIsLoading(true);
 
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (email.trim() && password.trim()) {
-        const userData = {
-          username: email.split('@')[0],
-          email: email.trim(),
-          id: Date.now(),
-          loginTime: new Date().toISOString()
-        };
-        
-        if (onLoginSuccess) {
-          onLoginSuccess(userData);
-        }
-        
-        navigate('/', { state: { username: userData.username } });
-      } else {
-        setError('Invalid credentials');
+  try {
+    const response = await fetch(LOGIN_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: email.trim(),
+        password: password.trim(),
+      }),
+    });
+
+    const data = await response.json();
+    console.log(data)
+    if (response.ok) {
+      const userData = {
+        username: data.username,
+        email: data.email || email,
+        id: data.id || Date.now(),
+        loginTime: new Date().toISOString(),
+        token: data.token // Optional: if backend returns JWT token
+      };
+      localStorage.setItem('userData', JSON.stringify(userData));
+      if (onLoginSuccess) {
+        onLoginSuccess(userData);
       }
-    } catch (err) {
-      setError('Login failed. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
-  const handleSignupSubmit = async (e) => {
-    e.preventDefault();
-    
-    setError('');
-    
-    if (!username.trim()) {
-      setError('Please enter a username');
-      return;
+      navigate('/', { state: { username: userData.username } });
+    } else {
+      setError(data.message || 'Invalid credentials');
     }
-    
-    if (!email.trim()) {
-      setError('Please enter your email');
-      return;
-    }
-    
-    if (!validateEmail(email)) {
-      setError('Please enter a valid email address');
-      return;
-    }
-    
-    if (!createPassword.trim()) {
-      setError('Please create a password');
-      return;
-    }
-    
-    if (!confirmPassword.trim()) {
-      setError('Please confirm your password');
-      return;
-    }
-    
-    if (createPassword !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
+  } catch (err) {
+    console.error(err);
+    setError('Login failed. Please try again.');
+  } finally {
+    setIsLoading(false);
+  }
+};
 
-    setIsLoading(true);
+const handleSignupSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
 
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (username.trim() && email.trim() && createPassword.trim()) {
-        const userData = {
-          username: username.trim(),
-          email: email.trim(),
-          id: Date.now(),
-          loginTime: new Date().toISOString()
-        };
-        
-        if (onLoginSuccess) {
-          onLoginSuccess(userData);
-        }
-        
-        navigate('/', { state: { username: userData.username } });
-      } else {
-        setError('Sign up failed');
+  if (!username.trim()) {
+    setError('Please enter a username');
+    return;
+  }
+
+  if (!email.trim()) {
+    setError('Please enter your email');
+    return;
+  }
+
+  if (!validateEmail(email)) {
+    setError('Please enter a valid email address');
+    return;
+  }
+
+  if (!createPassword.trim()) {
+    setError('Please create a password');
+    return;
+  }
+
+  if (!confirmPassword.trim()) {
+    setError('Please confirm your password');
+    return;
+  }
+
+  if (createPassword !== confirmPassword) {
+    setError('Passwords do not match');
+    return;
+  }
+
+  setIsLoading(true);
+
+  try {
+    const response = await fetch(SIGN_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: username.trim(),
+        email: email.trim(),
+        password: createPassword.trim(),
+      }),
+    });
+    console.log(response)
+    const text = await response.text();
+
+    if (response.ok && text === 'success') {
+      const userData = {
+        username: username.trim(),
+        email: email.trim(),
+        id: Date.now(),
+        loginTime: new Date().toISOString(),
+      };
+
+      localStorage.setItem('userData', JSON.stringify(userData));
+
+      if (onLoginSuccess) {
+        onLoginSuccess(userData);
       }
-    } catch (err) {
-      setError('Sign up failed. Please try again.');
-    } finally {
-      setIsLoading(false);
+
+      navigate('/', { state: { username: userData.username } });
+    } else {
+      setError(text || 'Signup failed');
     }
-  };
+  } catch (err) {
+    console.error(err);
+    setError('Sign up failed. Please try again.');
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const handleDemoLogin = () => {
     const demoUser = {
