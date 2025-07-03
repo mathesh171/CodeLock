@@ -1,0 +1,9 @@
+/* components/JoinButton/JoinButton.module.css */
+.w-full {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  text-align: center;
+}
