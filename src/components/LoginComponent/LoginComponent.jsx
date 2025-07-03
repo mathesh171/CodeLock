@@ -1,40 +1,71 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './LoginComponent.module.css';
 import Button from '../Button/Button';
 
 const LoginComponent = ({
-  username,
-  setUsername,
+  email,
+  onEmailChange,
   password,
-  setPassword,
+  onPasswordChange,
   isLoading,
   error,
-  handleSubmit,
-  handleDemoLogin,
+  onSubmit,
+  onDemoLogin,
   onSwitchToSignup
 }) => {
+  const [emailError, setEmailError] = useState('');
+
+  const validateEmail = (emailValue) => {
+    if (emailValue && !emailValue.includes('@')) {
+      setEmailError('Please enter a valid email address');
+      return false;
+    } else {
+      setEmailError('');
+      return true;
+    }
+  };
+
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    onEmailChange(value);
+    validateEmail(value);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    if (!validateEmail(email)) {
+      return;
+    }
+    
+    onSubmit(e);
+  };
+
   return (
     <div className={styles.formContainer}>
       <h2 className={styles.formTitle}>Login</h2>
       
       <form onSubmit={handleSubmit} className={styles.form}>
-        {/* Username/Email Input */}
         <div className={styles.inputGroup}>
-          <label htmlFor="username" className={styles.label}>
-            Username / Mail
+          <label htmlFor="email" className={styles.label}>
+            Email
           </label>
           <input
-            id="username"
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Enter your username or email"
+            id="email"
+            type="email"
+            value={email}
+            onChange={handleEmailChange}
+            placeholder="Enter your email"
             className={styles.input}
             disabled={isLoading}
           />
+          {emailError && (
+            <div className={styles.validationError}>
+              {emailError}
+            </div>
+          )}
         </div>
 
-        {/* Password Input */}
         <div className={styles.inputGroup}>
           <label htmlFor="password" className={styles.label}>
             Password
@@ -43,24 +74,22 @@ const LoginComponent = ({
             id="password"
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => onPasswordChange(e.target.value)}
             placeholder="Enter your password"
             className={styles.input}
             disabled={isLoading}
           />
         </div>
 
-        {/* Error Message */}
         {error && (
           <div className={styles.errorMessage}>
             {error}
           </div>
         )}
 
-        {/* Submit Button */}
         <Button
-          onClick={handleSubmit}
-          disabled={isLoading}
+          type="submit"
+          disabled={isLoading || emailError}
           variant="primary"
           size="large"
           className={styles.submitButton}
@@ -68,7 +97,6 @@ const LoginComponent = ({
           {isLoading ? 'Logging in...' : 'Login'}
         </Button>
 
-        {/* Toggle Mode Link */}
         <div className={styles.toggleContainer}>
           <button
             type="button"
@@ -81,10 +109,9 @@ const LoginComponent = ({
         </div>
       </form>
 
-      {/* Demo Login Button */}
       <div className={styles.demoSection}>
         <Button
-          onClick={handleDemoLogin}
+          onClick={onDemoLogin}
           disabled={isLoading}
           variant="secondary"
           size="large"

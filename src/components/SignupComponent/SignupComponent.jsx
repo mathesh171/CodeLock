@@ -1,101 +1,159 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './SignupComponent.module.css';
 import Button from '../Button/Button.jsx';
 
 const SignupComponent = ({
   username,
-  setUsername,
-  password,
-  setPassword,
+  onUsernameChange,
+  email,
+  onEmailChange,
+  createPassword,
+  onCreatePasswordChange,
   confirmPassword,
-  setConfirmPassword,
-  gmail,
-  setGmail,
+  onConfirmPasswordChange,
   isLoading,
   error,
-  handleSubmit,
+  onSubmit,
   onSwitchToLogin
 }) => {
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  const validateEmail = (emailValue) => {
+    if (emailValue && !emailValue.includes('@')) {
+      setEmailError('Please enter a valid email address');
+      return false;
+    } else {
+      setEmailError('');
+      return true;
+    }
+  };
+
+  const validatePasswordMatch = (createPwd, confirmPwd) => {
+    if (createPwd && confirmPwd && createPwd !== confirmPwd) {
+      setPasswordError('Passwords do not match');
+      return false;
+    } else {
+      setPasswordError('');
+      return true;
+    }
+  };
+
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    onEmailChange(value);
+    validateEmail(value);
+  };
+
+  const handleCreatePasswordChange = (e) => {
+    const value = e.target.value;
+    onCreatePasswordChange(value);
+    validatePasswordMatch(value, confirmPassword);
+  };
+
+  const handleConfirmPasswordChange = (e) => {
+    const value = e.target.value;
+    onConfirmPasswordChange(value);
+    validatePasswordMatch(createPassword, value);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    const emailValid = validateEmail(email);
+    const passwordValid = validatePasswordMatch(createPassword, confirmPassword);
+    
+    if (!emailValid || !passwordValid) {
+      return;
+    }
+    
+    onSubmit(e);
+  };
+
   return (
     <div className={styles.formContainer}>
       <h2 className={styles.formTitle}>Sign Up</h2>
       
       <form onSubmit={handleSubmit} className={styles.form}>
-        {/* Username Input */}
         <div className={styles.inputGroup}>
           <label htmlFor="username" className={styles.label}>
-            User name
+            Username
           </label>
           <input
             id="username"
             type="text"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => onUsernameChange(e.target.value)}
             placeholder="Enter your username"
             className={styles.input}
             disabled={isLoading}
           />
         </div>
 
-        {/* Gmail Input */}
         <div className={styles.inputGroup}>
-          <label htmlFor="gmail" className={styles.label}>
-            Gmail
+          <label htmlFor="email" className={styles.label}>
+            Email
           </label>
           <input
-            id="gmail"
+            id="email"
             type="email"
-            value={gmail}
-            onChange={(e) => setGmail(e.target.value)}
-            placeholder="Enter your Gmail address"
+            value={email}
+            onChange={handleEmailChange}
+            placeholder="Enter your email address"
             className={styles.input}
             disabled={isLoading}
           />
+          {emailError && (
+            <div className={styles.validationError}>
+              {emailError}
+            </div>
+          )}
         </div>
 
-        {/* Password Input */}
         <div className={styles.inputGroup}>
-          <label htmlFor="password" className={styles.label}>
-            New password
+          <label htmlFor="createPassword" className={styles.label}>
+            Create Password
           </label>
           <input
-            id="password"
+            id="createPassword"
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={createPassword}
+            onChange={handleCreatePasswordChange}
             placeholder="Create a new password"
             className={styles.input}
             disabled={isLoading}
           />
         </div>
 
-        {/* Confirm Password Input */}
         <div className={styles.inputGroup}>
           <label htmlFor="confirmPassword" className={styles.label}>
-            Confirm password
+            Confirm Password
           </label>
           <input
             id="confirmPassword"
             type="password"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={handleConfirmPasswordChange}
             placeholder="Confirm your password"
             className={styles.input}
             disabled={isLoading}
           />
+          {passwordError && (
+            <div className={styles.validationError}>
+              {passwordError}
+            </div>
+          )}
         </div>
 
-        {/* Error Message */}
         {error && (
           <div className={styles.errorMessage}>
             {error}
           </div>
         )}
 
-        {/* Submit Button */}
         <Button
-          onClick={handleSubmit}
-          disabled={isLoading}
+          type="submit"
+          disabled={isLoading || emailError || passwordError}
           variant="primary"
           size="large"
           className={styles.submitButton}
@@ -103,7 +161,6 @@ const SignupComponent = ({
           {isLoading ? 'Signing up...' : 'Sign Up'}
         </Button>
 
-        {/* Toggle Mode Link */}
         <div className={styles.toggleContainer}>
           <button
             type="button"
