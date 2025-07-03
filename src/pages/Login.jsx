@@ -60,7 +60,6 @@ const Login = ({ onLoginSuccess }) => {
     });
 
     const data = await response.json();
-    console.log(data)
     if (response.ok) {
       const userData = {
         username: data.username,
