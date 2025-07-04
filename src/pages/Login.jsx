@@ -23,8 +23,8 @@ const Login = ({ onLoginSuccess }) => {
   const validateEmail = (email) => {
     return email.includes('@');
   };
-  const LOGIN_API_URL = 'http://localhost:8084/api/auth/login';
-  const SIGN_API_URL = 'http://localhost:8084/api/auth/register';
+  const LOGIN_API_URL = 'https://codelock-backend-production.up.railway.app/api/auth/login';
+  const SIGN_API_URL = 'https://codelock-backend-production.up.railway.app/api/auth/register';
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     

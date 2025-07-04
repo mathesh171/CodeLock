@@ -25,7 +25,7 @@ const Dashboard = () => {
 
     const fetchProfile = async () => {
       try {
-        const response = await axios.get(`http://localhost:8084/api/users/profile/username/${username}`);
+        const response = await axios.get(`https://codelock-backend-production.up.railway.app/api/users/profile/username/${username}`);
         setProfile(response.data);
       } catch (err) {
         console.error('Error fetching profile:', err);
