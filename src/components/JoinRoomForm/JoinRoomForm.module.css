@@ -1,4 +1,3 @@
-/* components/JoinRoomForm/JoinRoomForm.module.css */
 .formContainer {
   width: 100%;
   max-width: 28rem;
@@ -25,5 +24,4 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 1rem;
 }

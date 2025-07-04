@@ -1,4 +1,3 @@
-/* components/RoomInput/RoomInput.module.css */
 .inputSection {
   margin-bottom: 2rem;
 }
@@ -12,9 +11,7 @@
   display: block;
 }
 
-.inputContainer {
-  margin-bottom: 1.5rem;
-}
+
 
 .input {
   width: 100%;

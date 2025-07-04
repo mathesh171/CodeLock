@@ -1,4 +1,3 @@
-// components/JoinRoomContainer/JoinRoomContainer.jsx
 import React from 'react';
 import styles from './JoinRoomContainer.module.css';
 import JoinRoomForm from '../JoinRoomForm/JoinRoomForm';

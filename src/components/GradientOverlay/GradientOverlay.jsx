@@ -1,4 +1,3 @@
-// components/GradientOverlay/GradientOverlay.jsx
 import React from 'react';
 import styles from './GradientOverlay.module.css';
 

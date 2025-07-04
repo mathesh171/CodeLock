@@ -1,4 +1,3 @@
-// components/JoinRoomForm/JoinRoomForm.jsx
 import React from 'react';
 import styles from './JoinRoomForm.module.css';
 import RoomInput from '../RoomInput/RoomInput';

@@ -1,4 +1,3 @@
-// components/AppHeader/AppHeader.jsx
 import React from 'react';
 import styles from './AppHeader.module.css';
 import Logo from '../Logo/Logo';
