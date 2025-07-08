@@ -1,4 +1,5 @@
-.w-full {
+/* src/components/JoinButton/JoinButton.module.css */
+.wFull {
   width: 100%;
   display: flex;
   justify-content: center;

@@ -19,6 +19,8 @@ const Dashboard = () => {
     new: '',
     confirm: ''
   });
+  const [recentGames, setRecentGames] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Check if demo user
   const isDemoUser = localStorage.getItem('isDemoUser') === 'true';
@@ -37,10 +39,11 @@ const Dashboard = () => {
   useEffect(() => {
     if (!username && !isDemoUser) {
       setError('You must be logged in to view the dashboard.');
+      setLoading(false);
       return;
     }
 
-    const fetchProfile = async () => {
+    const fetchData = async () => {
       try {
         if (isDemoUser) {
           // Generate demo data
@@ -52,55 +55,108 @@ const Dashboard = () => {
             losses: Math.floor(Math.random() * 20) + 1
           };
           setProfile(demoProfile);
+          setRecentGames(generateDemoGames());
+          setLoading(false);
           return;
         }
 
-        const response = await axios.get(`http://localhost:8084/api/users/profile/username/${username}`);
-        setProfile(response.data);
+        // Fetch user profile
+        const profileResponse = await axios.get(
+          `http://localhost:8084/api/users/profile/username/${username}`
+        );
+        setProfile(profileResponse.data);
+
+        // Fetch recent matches (you'll need to implement this endpoint)
+        try {
+          const matchesResponse = await axios.get(
+            `http://localhost:8084/api/users/matches/${username}`
+          );
+          setRecentGames(matchesResponse.data);
+        } catch (matchError) {
+          console.error('Error fetching matches:', matchError);
+          setRecentGames([]);
+        }
+
       } catch (err) {
         console.error('Error fetching profile:', err);
         setError('Failed to load profile');
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchProfile();
+    fetchData();
   }, [username, isDemoUser]);
+
+  const generateDemoGames = () => {
+    return [
+      { date: '2024-01-15', opponent: 'Player123', result: 'Win', score: 95 },
+      { date: '2024-01-14', opponent: 'CodeMaster', result: 'Loss', score: 78 },
+      { date: '2024-01-13', opponent: 'DevGuru', result: 'Win', score: 89 },
+    ];
+  };
+
+  const handlePasswordChange = async () => {
+    if (passwordData.new !== passwordData.confirm) {
+      setError('New passwords do not match');
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        'http://localhost:8084/api/users/change-password',
+        {
+          username,
+          currentPassword: passwordData.current,
+          newPassword: passwordData.new
+        }
+      );
+      
+      if (response.data.success) {
+        setError('');
+        setIsEditing(false);
+        setPasswordData({ current: '', new: '', confirm: '' });
+      } else {
+        setError(response.data.message || 'Password change failed');
+      }
+    } catch (err) {
+      console.error('Error changing password:', err);
+      setError(err.response?.data?.message || 'Error changing password');
+    }
+  };
+
+  const updateProfileField = async (field, value) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:8084/api/users/update/${username}`,
+        { [field]: value }
+      );
+      
+      if (response.data.success) {
+        setProfile(prev => ({ ...prev, [field]: value }));
+        setError('');
+        return true;
+      } else {
+        setError(response.data.message || 'Update failed');
+        return false;
+      }
+    } catch (err) {
+      console.error('Error updating profile:', err);
+      setError(err.response?.data?.message || 'Error updating profile');
+      return false;
+    }
+  };
 
   // Generate stats based on available data
   const stats = {};
   if (profile?.totalmatch !== undefined) stats.gamesPlayed = profile.totalmatch;
   if (profile?.wins !== undefined) stats.wins = profile.wins;
+  if (profile?.losses !== undefined) stats.losses = profile.losses;
   
-  // Only include averageScore and bestTime if they exist in profile
-  if (profile?.averageScore !== undefined) stats.averageScore = profile.averageScore;
-  if (profile?.bestTime !== undefined) stats.bestTime = profile.bestTime;
-  
-  // For demo user, generate random stats
-  if (isDemoUser) {
-    stats.averageScore = Math.floor(Math.random() * 30) + 70;
-    stats.bestTime = `${Math.floor(Math.random() * 5)}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`;
+  // Calculate win percentage if we have wins and total matches
+  if (profile?.wins !== undefined && profile?.totalmatch !== undefined && profile.totalmatch > 0) {
+    stats.winPercentage = Math.round((profile.wins / profile.totalmatch) * 100);
   }
-
-  const recentGames = [
-    { date: '2024-01-15', opponent: 'Player123', result: 'Win', score: 95 },
-    { date: '2024-01-14', opponent: 'CodeMaster', result: 'Loss', score: 78 },
-    { date: '2024-01-13', opponent: 'DevGuru', result: 'Win', score: 89 },
-  ];
-
-  const handlePasswordChange = (e) => {
-    const { name, value } = e.target;
-    setPasswordData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const submitPasswordChange = () => {
-    // Here you would typically make an API call to update the password
-    console.log('Password change submitted', passwordData);
-    setIsEditing(false);
-    setPasswordData({ current: '', new: '', confirm: '' });
-  };
 
   // Redirect or message if user is not logged in and not demo user
   if (!username && !isDemoUser) {
@@ -117,6 +173,20 @@ const Dashboard = () => {
     );
   }
 
+  if (loading) {
+    return (
+      <div className={styles.container}>
+        <BackgroundEffects />
+        <DecorativeElements />
+        <GradientOverlay />
+        <div className={styles.loadingOverlay}>
+          <div className={styles.spinner}></div>
+          <p>Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       <BackgroundEffects />
@@ -124,11 +194,10 @@ const Dashboard = () => {
       <GradientOverlay />
       
       <div className={styles.content}>
-        <div className={styles.logoContainer}>
-          <Logo />
-        </div>
-
         <header className={styles.header}>
+          <div className={styles.logoContainer}>
+            <Logo />
+          </div>
           <h1 className={styles.title}>Dashboard</h1>
           {isDemoUser && (
             <div className={styles.demoBadge}>
@@ -144,8 +213,15 @@ const Dashboard = () => {
             isEditing={isEditing}
             passwordData={passwordData}
             onEditToggle={() => setIsEditing(!isEditing)}
-            onPasswordChange={handlePasswordChange}
-            onSubmitPassword={submitPasswordChange}
+            onPasswordChange={(e) => {
+              const { name, value } = e.target;
+              setPasswordData(prev => ({
+                ...prev,
+                [name]: value
+              }));
+            }}
+            onSubmitPassword={handlePasswordChange}
+            onFieldUpdate={updateProfileField}
           />
           <StatsGrid stats={stats} />
           <RecentGamesTable games={recentGames} />

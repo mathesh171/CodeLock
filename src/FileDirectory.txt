@@ -6,6 +6,7 @@ src
     |----main.jsx
 |-
     |-assets
+        |----edit.png
         |----logo.jpeg
         |----logo.png
         |----looking.jpg

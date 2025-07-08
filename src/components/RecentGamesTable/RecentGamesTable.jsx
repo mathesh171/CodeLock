@@ -2,31 +2,43 @@ import React from 'react';
 import styles from './RecentGamesTable.module.css';
 
 const RecentGamesTable = ({ games }) => {
+  if (!games || games.length === 0) {
+    return (
+      <div className={styles.noGames}>
+        <p>No recent games found</p>
+      </div>
+    );
+  }
+
   return (
-    <div className={styles.tableContainer}>
+    <div className={styles.gamesTable}>
       <div className={styles.tableHeader}>
-        <h3 className={styles.tableTitle}>Recent Games</h3>
+        <h3 className={styles.tableTitle}>🎮 Recent Games</h3>
       </div>
       
-      <div className={styles.tableWrapper}>
-        <table className={styles.table}>
-          <thead className={styles.thead}>
+      <div className={styles.tableContent}>
+        <table>
+          <thead>
             <tr>
-              <th className={styles.th}>Date</th>
-              <th className={styles.th}>Opponent</th>
-              <th className={styles.th}>Result</th>
-              <th className={styles.th}>Score</th>
+              <th>Date</th>
+              <th>Opponent</th>
+              <th>Result</th>
+              <th>Score</th>
             </tr>
           </thead>
-          <tbody className={styles.tbody}>
+          <tbody>
             {games.map((game, index) => (
-              <tr key={index} className={styles.tr}>
-                <td className={styles.td}>{game.date}</td>
-                <td className={styles.td}>{game.opponent}</td>
-                <td className={`${styles.td} ${game.result === 'Win' ? styles.win : styles.loss}`}>
-                  {game.result}
+              <tr key={index}>
+                <td>{game.date}</td>
+                <td>{game.opponent}</td>
+                <td>
+                  <span className={`${styles.resultBadge} ${
+                    game.result === 'Win' ? styles.win : styles.loss
+                  }`}>
+                    {game.result}
+                  </span>
                 </td>
-                <td className={styles.td}>{game.score}%</td>
+                <td>{game.score}</td>
               </tr>
             ))}
           </tbody>
