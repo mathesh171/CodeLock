@@ -26,6 +26,20 @@ const LandingPage = ({ onCreateChallenge, onJoinChallenge, onLogin }) => {
     };
   }, []);
 
+  // Close dropdown when pressing Escape key
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, []);
+
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
@@ -38,55 +52,7 @@ const LandingPage = ({ onCreateChallenge, onJoinChallenge, onLogin }) => {
   const handleLogout = () => {
     setIsDropdownOpen(false);
     logout();
-  };
-
-  const dropdownStyles = {
-    position: 'absolute',
-    top: '100%',
-    right: '0',
-    backgroundColor: '#1e293b',
-    border: '1px solid #334155',
-    borderRadius: '8px',
-    minWidth: '150px',
-    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.3)',
-    zIndex: 1000,
-    display: isDropdownOpen ? 'block' : 'none',
-    marginTop: '8px'
-  };
-
-  const dropdownItemStyles = {
-    padding: '12px 16px',
-    color: '#e2e8f0',
-    cursor: 'pointer',
-    borderBottom: '1px solid #334155',
-    transition: 'background-color 0.2s ease',
-    fontSize: '14px',
-    fontWeight: '500'
-  };
-
-  const dropdownItemHoverStyles = {
-    backgroundColor: '#334155'
-  };
-
-  const usernameButtonStyles = {
-    background: 'transparent',
-    border: '2px solid #3b82f6',
-    color: '#3b82f6',
-    padding: '8px 16px',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: '600',
-    ransition: 'all 0.3s ease',
-    position: 'relative',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px'
-  };
-
-  const usernameContainerStyles = {
-    position: 'relative',
-    display: 'inline-block'
+    navigate('/'); // Ensure user stays on home page after logout
   };
 
   return (
@@ -101,59 +67,42 @@ const LandingPage = ({ onCreateChallenge, onJoinChallenge, onLogin }) => {
             <Logo responsive={true} />
           </div>
 
-          <div style={usernameContainerStyles} ref={dropdownRef}>
+          <div className={styles.userSection} ref={dropdownRef}>
             {user ? (
               <>
                 <button
                   onClick={toggleDropdown}
-                  style={usernameButtonStyles}
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = '#3b82f6';
-                    e.target.style.color = '#ffffff';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = 'transparent';
-                    e.target.style.color = '#3b82f6';
-                  }}
+                  className={styles.usernameButton}
+                  aria-label={`User menu for ${user.username}`}
+                  aria-expanded={isDropdownOpen}
+                  aria-haspopup="true"
                 >
-                  {user.username}
-                  <span style={{
-                    transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                    transition: 'transform 0.2s ease'
-                  }}>
+                  <span className={styles.username}>{user.username}</span>
+                  <span className={`${styles.dropdownArrow} ${isDropdownOpen ? styles.dropdownArrowOpen : ''}`}>
                     ▼
                   </span>
                 </button>
                 
-                <div style={dropdownStyles}>
-                  <div
-                    style={dropdownItemStyles}
-                    onClick={handleDashboard}
-                    onMouseEnter={(e) => {
-                      Object.assign(e.target.style, dropdownItemHoverStyles);
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = 'transparent';
-                    }}
-                  >
-                    Dashboard
+                {isDropdownOpen && (
+                  <div className={styles.dropdown} role="menu" aria-labelledby="user-menu">
+                    <button
+                      className={styles.dropdownItem}
+                      onClick={handleDashboard}
+                      role="menuitem"
+                      tabIndex={0}
+                    >
+                      Dashboard
+                    </button>
+                    <button
+                      className={styles.dropdownItem}
+                      onClick={handleLogout}
+                      role="menuitem"
+                      tabIndex={0}
+                    >
+                      Logout
+                    </button>
                   </div>
-                  <div
-                    style={{
-                      ...dropdownItemStyles,
-                      borderBottom: 'none'
-                    }}
-                    onClick={handleLogout}
-                    onMouseEnter={(e) => {
-                      Object.assign(e.target.style, dropdownItemHoverStyles);
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = 'transparent';
-                    }}
-                  >
-                    Logout
-                  </div>
-                </div>
+                )}
               </>
             ) : (
               <Button
@@ -198,12 +147,6 @@ const LandingPage = ({ onCreateChallenge, onJoinChallenge, onLogin }) => {
             Join Challenge
           </Button>
         </div>
-
-        {/* Decorative elements */}
-        {/* <div className={styles.decorativeCircle1}></div>
-        <div className={styles.decorativeCircle2}></div>
-        <div className={styles.decorativeDot1}></div>
-        <div className={styles.decorativeDot2}></div> */}
       </main>
 
       <div className={styles.gradientOverlay}></div>
