@@ -43,7 +43,23 @@ const CreateRoom = () => {
       const response = await axios.post('http://localhost:8084/api/room/create', roomData);
       
       if (response.data) {
-        navigate(`/lobby/${response.data}`); // Assuming backend returns room code
+        // Pass room data to Lobby page
+        navigate(`/lobby/${response.data}`, {
+          state: {
+            roomData: {
+              roomCode: response.data, // Room code from backend
+              difficulty: roomData.difficulty,
+              num_questions: roomData.num_questions,
+              timer: roomData.timer === 0 ? 'Unlimited' : roomData.timer,
+              players: [
+                {
+                  name: userData.username,
+                  isHost: true
+                }
+              ]
+            }
+          }
+        });
       } else {
         alert('Failed to create room');
       }
@@ -57,7 +73,7 @@ const CreateRoom = () => {
     <div className={styles.container}>
       <StarryBackground />
       <div className={styles.logo}>
-        <Logo/>
+        <Logo />
       </div>
       <main className={styles.mainContent}>
         <CreateRoomForm
