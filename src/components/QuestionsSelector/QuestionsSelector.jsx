@@ -14,15 +14,16 @@ const QuestionsSelector = ({
   const [customQuestionsValue, setCustomQuestionsValue] = React.useState('');
   const [shouldHideCustomQuestions, setShouldHideCustomQuestions] = React.useState(false);
 
-  const handleCustomQuestionsSubmit = () => {
+   const handleCustomQuestionsSubmit = () => {
     const value = parseInt(roomSettings?.customQuestions);
-    if (value >= 1 && value <= 100) {
+    if (!isNaN(value) && value >= 1 && value <= 100) {
       setCustomQuestionsError('');
       setIsCustomQuestionsSet(true);
       setCustomQuestionsValue(value.toString());
+      setRoomSettings(prev => ({ ...prev, questions: value }));
       onCustomQuestionsSubmit();
     } else {
-      setCustomQuestionsError('Enter Number between 1 to 100');
+      setCustomQuestionsError('Enter number between 1-100');
     }
   };
 
