@@ -77,7 +77,7 @@ const LandingPage = ({ onCreateChallenge, onJoinChallenge, onLogin }) => {
     cursor: 'pointer',
     fontSize: '14px',
     fontWeight: '600',
-    transition: 'all 0.3s ease',
+    ransition: 'all 0.3s ease',
     position: 'relative',
     display: 'flex',
     alignItems: 'center',

@@ -1,0 +1,31 @@
+.logo{
+  margin-top: 2rem;
+  margin-left: 2rem;
+}
+
+.container {
+  min-height: 100vh;
+  background-color: #111827;
+  position: relative;
+  overflow: hidden;
+}
+
+.mainContent {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 120px);
+  padding: 0 1.5rem;
+}
+
+.gradientOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom right, rgba(88, 28, 135, 0.1), transparent, rgba(22, 78, 99, 0.1));
+  pointer-events: none;
+}

@@ -1,0 +1,46 @@
+.formContainer {
+  width: 100%;
+  max-width: 32rem;
+  background-color: rgba(31, 41, 55, 0.6);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(75, 85, 99, 0.5);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  transition: all 0.3s ease-out;
+}
+
+.formTitle {
+  color: white;
+  font-size: 1.875rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 2rem;
+  margin-top: 0;
+}
+
+.createButton {
+  width: 100%;
+  background: linear-gradient(to right, #2563eb, #1d4ed8);
+  color: white;
+  font-weight: bold;
+  padding: 1rem 2rem;
+  border-radius: 9999px;
+  font-size: 1.25rem;
+  transform: scale(1);
+  transition: all 0.3s ease-out;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+.createButton:hover {
+  background: linear-gradient(to right, #1d4ed8, #1e40af);
+  transform: scale(1.05);
+  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.25), 0 4px 6px -2px rgba(59, 130, 246, 0.1);
+}
+
+.createButton:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
+}
