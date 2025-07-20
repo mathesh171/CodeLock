@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthUser } from '../context/AuthUser';
+import { useAuthUser } from '../context/AuthUser';
 import Logo from '../components/Logo/Logo.jsx';
 import looking from '../assets/looking.jpg';
 import BackgroundEffects from '../components/BackgroundEffects/BackgroundEffects.jsx';
@@ -10,7 +10,7 @@ import LoginContainer from '../components/LoginContainer/LoginContainer.jsx';
 
 const Login = ({ onLoginSuccess }) => {
   const navigate = useNavigate();
-  const { login } = useContext(AuthUser);
+  const { login } = useAuthUser();
 
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [username, setUsername] = useState('');

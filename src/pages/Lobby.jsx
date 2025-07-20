@@ -1,18 +1,90 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './Lobby.module.css';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import StarryBackground from '../components/StarryBackground/StarryBackground';
 import Logo from '../components/Logo/Logo';
+import { useRoom } from '../context/RoomContext';
+import { startRoom } from '../services/room';
+import { connectWebSocket, disconnectWebSocket, sendStartTest } from '../services/socket';
 
-const Lobby = ({ onBackToLanding, onStartGame, isHost = true }) => {
+const Lobby = ({ onBackToLanding, onStartGame }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const roomData = location.state?.roomData || {};
+  const { isHost, roomCode } = useRoom();
+  const [message, setMessage] = useState("");
+  const [starting, setStarting] = useState(false);
+  const [liveRoomData, setLiveRoomData] = useState(roomData);
 
+  useEffect(() => {
+    const code = roomCode || roomData.room_code || roomData.roomCode;
+
+    connectWebSocket(
+      (roomInfo) => {
+        setLiveRoomData(roomInfo);
+      },
+      (startMsg) => {
+        navigate(`/coding/${code}`);
+      },
+      code
+    );
+
+    // requestRoomInfo(code); <-- Now handled inside connectWebSocket after subscribing
+
+    return () => {
+      disconnectWebSocket();
+    };
+  }, [roomCode, roomData.room_code, roomData.roomCode, navigate]);
+  
+  useEffect(() => {
+    if (liveRoomData.status === "ONGOING") {
+      const code = roomCode || liveRoomData.room_code || liveRoomData.roomCode;
+      navigate(`/coding/${code}`);
+    }
+  }, [liveRoomData.status, roomCode, liveRoomData.room_code, liveRoomData.roomCode, navigate]);
+  
+  const handleStart = async () => {
+    setMessage("");
+    setStarting(true);
+    try {
+      const code = roomCode || liveRoomData?.room_code || liveRoomData?.roomCode;
+      const result = await startRoom(code);
+      if (result === "success") {
+        sendStartTest(code);
+        if (onStartGame) onStartGame();
+      } else {
+        setMessage(result);
+      }
+    } catch (err) {
+      setMessage(err.message);
+    } finally {
+      setStarting(false);
+    }
+  };
+  const authUser = JSON.parse(localStorage.getItem('authUser'));
+
+  // Assemble players from host and guest user IDs (no array by default in server object)
+  const players = [
+    liveRoomData.host_user_id && {
+      name: liveRoomData.host_user_id.username,
+      isHost: true,
+      isMe: authUser && liveRoomData.host_user_id.id === authUser.id
+    },
+    liveRoomData.guest_user_id && {
+      name: liveRoomData.guest_user_id.username,
+      isHost: false,
+      isMe: authUser && liveRoomData.guest_user_id.id === authUser.id
+    }
+  ].filter(Boolean);
+
+ const isHostuser =!!authUser &&
+  !!liveRoomData.host_user_id &&
+  authUser.username === liveRoomData.host_user_id.username;
   return (
     <div className={styles.container}>
-      <StarryBackground/>
+      <StarryBackground />
       <div className={styles.logo}>
-        <Logo/>
+        <Logo />
       </div>
 
       {/* Main Content */}
@@ -31,11 +103,17 @@ const Lobby = ({ onBackToLanding, onStartGame, isHost = true }) => {
                 <li><span>6.</span> No refreshing or external help allowed — fair play is mandatory.</li>
               </ol>
 
-              {isHost ? (
+              {isHostuser && players.length>1? (
                 <div className={styles.buttonContainer}>
-                  <button onClick={onStartGame} className={styles.startButton} aria-label="Start the game">
-                    START
+                  <button
+                    onClick={handleStart}
+                    className={styles.startButton}
+                    aria-label="Start the game"
+                    disabled={starting}
+                  >
+                    {starting ? "Starting..." : "START"}
                   </button>
+                  {message && <div style={{ color: 'red', marginTop: '1rem' }}>{message}</div>}
                 </div>
               ) : (
                 <div className={styles.waitingMessage}>
@@ -48,21 +126,38 @@ const Lobby = ({ onBackToLanding, onStartGame, isHost = true }) => {
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Room Details</h2>
               <dl className={styles.details}>
-                <div><dt>Room Code</dt><dd>{roomData?.roomCode || "N/A"}</dd></div>
-                <div><dt>Difficulty</dt><dd>{roomData?.difficulty || "N/A"}</dd></div>
-                <div><dt>Questions</dt><dd>{roomData?.num_questions || "N/A"}</dd></div>
-                <div><dt>Timer</dt><dd>{roomData?.timer || "N/A"} minutes</dd></div>
+                <div>
+                  <dt>Room Code</dt>
+                  <dd>{liveRoomData?.room_code || liveRoomData?.roomCode || "N/A"}</dd>
+                </div>
+                <div>
+                  <dt>Difficulty</dt>
+                  <dd>{liveRoomData?.difficulty || "N/A"}</dd>
+                </div>
+                <div>
+                  <dt>Questions</dt>
+                  <dd>{liveRoomData?.num_questions || "N/A"}</dd>
+                </div>
+                <div>
+                  <dt>Timer</dt>
+                  <dd>{liveRoomData?.timer || "N/A"} minutes</dd>
+                </div>
+                <div>
+                  <dt>Status</dt>
+                  <dd>{liveRoomData?.status || "N/A"}</dd>
+                </div>
               </dl>
-
 
               <div className={styles.players}>
                 <h3>Players</h3>
                 <ul>
-                  {roomData?.players?.length > 0 ? (
-                    roomData.players.map((player, index) => (
+                  {players.length > 0 ? (
+                    players.map((player, index) => (
                       <li key={index}>
                         <span>{index + 1}. {player.name}</span>
-                        {player.isHost && <span className={styles.hostBadge}>HOST</span>}
+                        {player.isHost && (
+                          <span className={styles.hostBadge}>HOST</span>
+                        )}
                       </li>
                     ))
                   ) : (

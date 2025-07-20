@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React from "react";
 import styles from './LoginComponent.module.css';
-import Button from '../Button/Button';
+import Button from '../Button/Button.jsx';
 
-const LoginComponent = ({
+function LoginComponent({
   email,
   onEmailChange,
   password,
@@ -12,40 +12,11 @@ const LoginComponent = ({
   onSubmit,
   onDemoLogin,
   onSwitchToSignup
-}) => {
-  const [emailError, setEmailError] = useState('');
-
-  const validateEmail = (emailValue) => {
-    if (emailValue && !emailValue.includes('@')) {
-      setEmailError('Please enter a valid email address');
-      return false;
-    } else {
-      setEmailError('');
-      return true;
-    }
-  };
-
-  const handleEmailChange = (e) => {
-    const value = e.target.value;
-    onEmailChange(value);
-    validateEmail(value);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    if (!validateEmail(email)) {
-      return;
-    }
-    
-    onSubmit(e);
-  };
-
+}) {
   return (
     <div className={styles.formContainer}>
       <h2 className={styles.formTitle}>Login</h2>
-      
-      <form onSubmit={handleSubmit} className={styles.form}>
+      <form onSubmit={onSubmit} className={styles.form}>
         <div className={styles.inputGroup}>
           <label htmlFor="email" className={styles.label}>
             Email
@@ -54,18 +25,13 @@ const LoginComponent = ({
             id="email"
             type="email"
             value={email}
-            onChange={handleEmailChange}
+            onChange={e => onEmailChange(e.target.value)}
             placeholder="Enter your email"
             className={styles.input}
             disabled={isLoading}
+            required
           />
-          {emailError && (
-            <div className={styles.validationError}>
-              {emailError}
-            </div>
-          )}
         </div>
-
         <div className={styles.inputGroup}>
           <label htmlFor="password" className={styles.label}>
             Password
@@ -74,29 +40,27 @@ const LoginComponent = ({
             id="password"
             type="password"
             value={password}
-            onChange={(e) => onPasswordChange(e.target.value)}
+            onChange={e => onPasswordChange(e.target.value)}
             placeholder="Enter your password"
             className={styles.input}
             disabled={isLoading}
+            required
           />
         </div>
-
         {error && (
           <div className={styles.errorMessage}>
             {error}
           </div>
         )}
-
         <Button
           type="submit"
-          disabled={isLoading || emailError}
+          disabled={isLoading}
           variant="primary"
           size="large"
           className={styles.submitButton}
         >
           {isLoading ? 'Logging in...' : 'Login'}
         </Button>
-
         <div className={styles.toggleContainer}>
           <button
             type="button"
@@ -108,7 +72,6 @@ const LoginComponent = ({
           </button>
         </div>
       </form>
-
       <div className={styles.demoSection}>
         <Button
           onClick={onDemoLogin}
@@ -125,6 +88,6 @@ const LoginComponent = ({
       </div>
     </div>
   );
-};
+}
 
 export default LoginComponent;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRoom } from '../context/RoomContext';
-import axios from 'axios';
+import { joinRoom } from '../services/room';
 import { ToastContainer, toast, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import BackgroundEffects from '../components/BackgroundEffects/BackgroundEffects';
@@ -16,7 +16,8 @@ const JoinRoomPage = () => {
 
   const handleJoinRoom = async () => {
     try {
-      const userData = JSON.parse(localStorage.getItem('userData'));
+      // Use 'authUser' instead of 'userData' for localStorage
+      const userData = JSON.parse(localStorage.getItem('authUser'));
       if (!userData) {
         toast.error('Please login first', {
           position: 'top-right',
@@ -31,18 +32,32 @@ const JoinRoomPage = () => {
         navigate('/login');
         return;
       }
+      if (!inputCode.trim()) {
+        toast.error('Please enter a room code.', {
+          position: 'top-right',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: 'dark',
+          transition: Bounce,
+        });
+        return;
+      }
+      // If backend expects lowercase, use: const roomcode = inputCode.trim().toLowerCase();
+      // If backend expects uppercase, use: const roomcode = inputCode.trim().toUpperCase();
+      // Otherwise, send as entered:
+      const roomcode = inputCode.trim();
 
-      const response = await axios.post('http://localhost:8084/api/room/join', {
-        roomcode: inputCode,
-        username: userData.username,
-      });
+      const result = await joinRoom({ roomcode, username: userData.username });
 
-      if (response.data === 'success') {
-        setRoomCode(inputCode);
+      if (result === 'success') {
+        setRoomCode(roomcode);
         setIsHost(false);
-        navigate(`/lobby/${inputCode}`);
+        navigate(`/lobby/${roomcode}`);
       } else {
-        toast.error('Failed to join room: ' + response.data, {
+        toast.error('Failed to join room: ' + result, {
           position: 'top-right',
           autoClose: 5000,
           hideProgressBar: false,
@@ -54,7 +69,6 @@ const JoinRoomPage = () => {
         });
       }
     } catch (error) {
-      console.error('Error joining room:', error);
       toast.error('Error joining room: ' + (error.response?.data?.message || error.message), {
         position: 'top-right',
         autoClose: 5000,

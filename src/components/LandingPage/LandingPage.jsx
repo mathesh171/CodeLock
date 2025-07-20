@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import Logo from '../Logo/Logo';
 import Button from '../Button/Button';
 import BackgroundEffects from '../BackgroundEffects/BackgroundEffects';
-import { AuthUser } from '../../context/AuthUser';
+import { useAuthUser } from '../../context/AuthUser';
 import styles from './LandingPage.module.css';
 
 const LandingPage = ({ onCreateChallenge, onJoinChallenge, onLogin }) => {
   const navigate = useNavigate();
-  const { user, logout } = useContext(AuthUser);
+  const { user, logout } = useAuthUser();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 

@@ -10,6 +10,16 @@ import RecentGamesTable from '../RecentGamesTable/RecentGamesTable';
 import Logo from '../Logo/Logo';
 import styles from './Dashboard.module.css';
 
+// Move userData and username above all code that uses them
+let userData = null;
+try {
+  const stored = localStorage.getItem('authUser');
+  userData = stored ? JSON.parse(stored) : null;
+} catch (err) {
+  console.error('Invalid JSON in localStorage:', err);
+}
+const username = userData?.username;
+
 const Dashboard = () => {
   const [profile, setProfile] = useState(null);
   const [error, setError] = useState('');
@@ -25,16 +35,24 @@ const Dashboard = () => {
   // Check if demo user
   const isDemoUser = localStorage.getItem('isDemoUser') === 'true';
 
-  // Retrieve and parse localStorage safely
-  let userData = null;
-  try {
-    const stored = localStorage.getItem('userData');
-    userData = stored ? JSON.parse(stored) : null;
-  } catch (err) {
-    console.error('Invalid JSON in localStorage:', err);
-  }
+  useEffect(() => {
+    if (!username) {
+      setError('You must be logged in to view the dashboard.');
+      return;
+    }
 
-  const username = userData?.username;
+    const fetchProfile = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8084/api/users/profile/username/${username}`);
+        setProfile(response.data);
+      } catch (err) {
+        console.error('Error fetching profile:', err);
+        setError('Failed to load profile');
+      }
+    };
+
+    fetchProfile();
+  }, [username]);
 
   useEffect(() => {
     if (!username && !isDemoUser) {
