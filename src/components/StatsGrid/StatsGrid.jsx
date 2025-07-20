@@ -1,44 +1,35 @@
+// components/StatsGrid/StatsGrid.jsx
 import React from 'react';
-import StatCard from '../StatCard/StatCard';
 import styles from './StatsGrid.module.css';
 
 const StatsGrid = ({ stats }) => {
-  const statItems = [
-    { 
-      title: 'Games Played', 
-      value: stats.gamesPlayed, 
-      bgColor: 'rgba(59, 130, 246, 0.1)',
-      borderColor: 'rgba(59, 130, 246, 0.3)',
-      icon: '🎮'
-    },
-    { 
-      title: 'Wins', 
-      value: stats.wins, 
-      bgColor: 'rgba(34, 197, 94, 0.1)',
-      borderColor: 'rgba(34, 197, 94, 0.3)',
-      icon: '🏆'
-    },
-    { 
-      title: 'Average Score', 
-      value: `${stats.averageScore}%`, 
-      bgColor: 'rgba(251, 146, 60, 0.1)',
-      borderColor: 'rgba(251, 146, 60, 0.3)',
-      icon: '📊'
-    },
-    { 
-      title: 'Best Time', 
-      value: stats.bestTime, 
-      bgColor: 'rgba(236, 72, 153, 0.1)',
-      borderColor: 'rgba(236, 72, 153, 0.3)',
-      icon: '⏱️'
-    }
-  ];
-
   return (
     <div className={styles.statsGrid}>
-      {statItems.map((stat, index) => (
-        <StatCard key={index} {...stat} />
-      ))}
+      <div className={styles.gridHeader}>
+        <h3 className={styles.gridTitle}>📊 Your Stats</h3>
+      </div>
+      
+      <div className={styles.gridContent}>
+        <div className={styles.statCard}>
+          <span className={styles.statLabel}>Games Played</span>
+          <span className={styles.statValue}>{stats.gamesPlayed || 0}</span>
+        </div>
+        
+        <div className={styles.statCard}>
+          <span className={styles.statLabel}>Wins</span>
+          <span className={styles.statValue}>{stats.wins || 0}</span>
+        </div>
+        
+        <div className={styles.statCard}>
+          <span className={styles.statLabel}>Avg Score</span>
+          <span className={styles.statValue}>{stats.averageScore || 'N/A'}</span>
+        </div>
+        
+        <div className={styles.statCard}>
+          <span className={styles.statLabel}>Best Time</span>
+          <span className={styles.statValue}>{stats.bestTime || 'N/A'}</span>
+        </div>
+      </div>
     </div>
   );
 };

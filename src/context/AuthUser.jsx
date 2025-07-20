@@ -1,107 +1,104 @@
 import React, { createContext, useState, useEffect } from 'react';
 
-// Create the AuthUser context
-const AuthUserContext = createContext();
+export const AuthUser = createContext();
 
-// Export the context as AuthUser for component imports
-export const AuthUser = AuthUserContext;
-
-// AuthUser Provider component
-export const AuthUserProvider = ({ children }) => {
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-  // Initialize user from localStorage on component mount
+  // Check for existing user data on app load
   useEffect(() => {
-    const initializeAuth = () => {
+    const checkExistingUser = () => {
       try {
-        const storedUser = localStorage.getItem('authUser');
-        if (storedUser) {
-          const parsedUser = JSON.parse(storedUser);
-          setUser(parsedUser);
+        const userData = localStorage.getItem('userData');
+        if (userData) {
+          const parsedUser = JSON.parse(userData);
+          
+          // Validate user data structure
+          if (parsedUser && parsedUser.username && parsedUser.email) {
+            setUser(parsedUser);
+          } else {
+            // Clear invalid data
+            localStorage.removeItem('userData');
+          }
         }
       } catch (error) {
-        console.error('Error parsing stored user data:', error);
-        localStorage.removeItem('authUser');
+        console.error('Error parsing user data:', error);
+        localStorage.removeItem('userData');
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
-    initializeAuth();
+    checkExistingUser();
   }, []);
 
-  // Login function
   const login = (userData) => {
     try {
+      // Validate required fields
+      if (!userData || !userData.username || !userData.email) {
+        throw new Error('Invalid user data');
+      }
+
+      // Set user state
       setUser(userData);
-      localStorage.setItem('authUser', JSON.stringify(userData));
+      
+      // Store in localStorage
+      localStorage.setItem('userData', JSON.stringify(userData));
+      
+      console.log('User logged in:', userData.username);
     } catch (error) {
-      console.error('Error storing user data:', error);
+      console.error('Login error:', error);
+      throw error;
     }
   };
 
-  // Logout function
   const logout = () => {
-    setUser(null);
-    localStorage.removeItem('authUser');
-  };
-
-  // Demo login function
-  const demoLogin = () => {
-    const demoUser = {
-      id: 'demo_user',
-      username: 'Demo User',
-      email: 'demo@example.com',
-      isDemo: true
-    };
-    login(demoUser);
-  };
-
-  // Update user function
-  const updateUser = (updatedData) => {
-    const updatedUser = { ...user, ...updatedData };
-    setUser(updatedUser);
     try {
-      localStorage.setItem('authUser', JSON.stringify(updatedUser));
+      // Clear user state
+      setUser(null);
+      
+      // Remove from localStorage
+      localStorage.removeItem('userData');
+      
+      // Clear any other auth-related data
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('refreshToken');
+      
+      console.log('User logged out successfully');
     } catch (error) {
-      console.error('Error updating user data:', error);
+      console.error('Logout error:', error);
     }
   };
 
-  // Check if user is authenticated
-  const isAuthenticated = () => {
-    return user !== null;
+  const updateUser = (updatedData) => {
+    try {
+      if (!user) {
+        throw new Error('No user to update');
+      }
+
+      const updatedUser = { ...user, ...updatedData };
+      setUser(updatedUser);
+      localStorage.setItem('userData', JSON.stringify(updatedUser));
+      
+      console.log('User data updated');
+    } catch (error) {
+      console.error('Update user error:', error);
+    }
   };
 
-  // Check if user is demo user
-  const isDemoUser = () => {
-    return user?.isDemo === true;
-  };
-
-  const contextValue = {
+  const value = {
     user,
-    isLoading,
     login,
     logout,
-    demoLogin,
     updateUser,
-    isAuthenticated,
-    isDemoUser
+    loading,
+    isAuthenticated: !!user
   };
 
   return (
-    <AuthUserContext.Provider value={contextValue}>
+    <AuthUser.Provider value={value}>
       {children}
-    </AuthUserContext.Provider>
+    </AuthUser.Provider>
   );
-};
-
-// Custom hook to use the AuthUser context
-export const useAuthUser = () => {
-  const context = React.useContext(AuthUserContext);
-  if (!context) {
-    throw new Error('useAuthUser must be used within an AuthUserProvider');
-  }
-  return context;
 };

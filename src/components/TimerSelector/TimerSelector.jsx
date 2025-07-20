@@ -16,16 +16,17 @@ const TimerSelector = ({
 
   const handleCustomTimerSubmit = () => {
     const value = parseInt(roomSettings?.customTimer);
-    if (value >= 1 && value <= 1000) {
+    if (!isNaN(value) && value >= 1 && value <= 1000) {
       setCustomTimerError('');
       setIsCustomTimerSet(true);
       setCustomTimerValue(value.toString());
+      setRoomSettings(prev => ({ ...prev, timer: value }));
       onCustomTimerSubmit();
     } else {
-      setCustomTimerError('Enter Number between 1 to 1000');
+      setCustomTimerError('Enter number between 1-1000');
     }
   };
-
+  
   const handleCustomTimerButtonClick = () => {
     if (isCustomTimerSet) {
       setIsCustomTimerSet(false);

@@ -1,8 +1,9 @@
+// src/components/DifficultySelector/DifficultySelector.jsx
 import React from 'react';
 import styles from './DifficultySelector.module.css';
 
 const DifficultySelector = ({ roomSettings = {}, setRoomSettings }) => {
-  const difficulties = ['Beginner', 'Easy', 'Medium', 'Hard'];
+  const difficulties = ['BEGINNER', 'EASY', 'MEDIUM', 'HARD']; // Uppercase to match backend enum
 
   const handleDifficultySelect = (difficulty) => {
     setRoomSettings(prev => ({ ...prev, difficulty }));
@@ -17,13 +18,13 @@ const DifficultySelector = ({ roomSettings = {}, setRoomSettings }) => {
             key={difficulty}
             onClick={() => handleDifficultySelect(difficulty)}
             className={`${styles.optionButton} ${
-              roomSettings?.difficulty === difficulty ? styles.selected : ''
+              roomSettings?.difficulty?.toUpperCase() === difficulty ? styles.selected : ''
             }`}
             role="radio"
-            aria-checked={roomSettings?.difficulty === difficulty}
-            aria-label={`Select ${difficulty} difficulty`}
+            aria-checked={roomSettings?.difficulty?.toUpperCase() === difficulty}
+            aria-label={`Select ${difficulty.toLowerCase()} difficulty`}
           >
-            {difficulty}
+            {difficulty.charAt(0) + difficulty.slice(1).toLowerCase()}
           </button>
         ))}
       </div>

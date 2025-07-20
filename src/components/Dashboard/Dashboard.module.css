@@ -3,7 +3,6 @@
   min-height: 100vh;
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
   overflow-x: hidden;
-  
 }
 
 .content {
@@ -12,6 +11,10 @@
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+}
+
+.logoContainer {
+  margin-bottom: 1rem;
 }
 
 .header {
@@ -29,6 +32,17 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.demoBadge {
+  background: rgba(255, 193, 7, 0.2);
+  border: 1px solid #ffc107;
+  border-radius: 4px;
+  padding: 8px;
+  margin: 10px auto;
+  color: #ffc107;
+  font-size: 14px;
+  max-width: 300px;
 }
 
 .dashboardGrid {
@@ -75,28 +89,39 @@
   box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
 }
 
-.backButtonContainer {
-  text-align: center;
+.loadingOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: rgba(15, 23, 42, 0.8);
+  z-index: 20;
 }
 
-.backButton {
-  display: inline-block;
-  padding: 0.875rem 2rem;
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  color: white;
-  text-decoration: none;
-  border-radius: 9999px;
-  font-weight: 600;
-  font-size: 1.1rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
-  border: 1px solid rgba(59, 130, 246, 0.4);
+.loadingOverlay .spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 4px solid rgba(34, 211, 238, 0.3);
+  border-top: 4px solid #22d3ee;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
 }
 
-.backButton:hover {
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4);
-  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+.loadingOverlay p {
+  color: #e2e8f0;
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Responsive Design */

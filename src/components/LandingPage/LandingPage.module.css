@@ -56,6 +56,116 @@ html, body {
   margin-bottom: 0;
 }
 
+.userSection {
+  position: relative;
+  display: inline-block;
+}
+
+.usernameButton {
+  background: transparent;
+  border: 2px solid #3b82f6;
+  color: #3b82f6;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  fontSize: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  outline: none;
+  min-width: 120px;
+  justify-content: space-between;
+}
+
+.usernameButton:hover {
+  background-color: #3b82f6;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.usernameButton:focus {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
+
+.usernameButton:active {
+  transform: translateY(0);
+}
+
+.username {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+}
+
+.dropdownArrow {
+  font-size: 10px;
+  transform: rotate(0deg);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.dropdownArrowOpen {
+  transform: rotate(180deg);
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  min-width: 150px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  margin-top: 8px;
+  animation: fadeInDown 0.2s ease-out;
+}
+
+.dropdownItem {
+  width: 100%;
+  padding: 12px 16px;
+  color: #e2e8f0;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  transition: background-color 0.2s ease;
+  font-family: inherit;
+  outline: none;
+}
+
+.dropdownItem:hover,
+.dropdownItem:focus {
+  background-color: #334155;
+  color: #ffffff;
+}
+
+.dropdownItem:first-child {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.dropdownItem:last-child {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.dropdownItem:not(:last-child) {
+  border-bottom: 1px solid #334155;
+}
+
 .titleSection {
   text-align: center;
   margin-bottom: 4rem;
@@ -72,7 +182,6 @@ html, body {
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  /* text-shadow: 3px 3px 10px rgba(255, 255, 255, 0.3); */
 }
 
 .secondaryTitle {
@@ -94,53 +203,6 @@ html, body {
   animation: fadeInUp 1s ease-out 0.6s both;
 }
 
-/* Enhanced decorative elements */
-.decorativeCircle1 {
-  position: absolute;
-  top: 10%;
-  left: 5%;
-  width: clamp(6rem, 12vw, 10rem);
-  height: clamp(6rem, 12vw, 10rem);
-  border: 2px solid rgba(34, 211, 238, 0.3);
-  border-radius: 50%;
-  animation: float 6s ease-in-out infinite, glow 3s ease-in-out infinite alternate;
-}
-
-.decorativeCircle2 {
-  position: absolute;
-  bottom: 15%;
-  right: 8%;
-  width: clamp(4rem, 8vw, 8rem);
-  height: clamp(4rem, 8vw, 8rem);
-  border: 2px solid rgba(196, 181, 253, 0.3);
-  border-radius: 50%;
-  animation: float 8s ease-in-out infinite reverse, glow 4s ease-in-out infinite alternate-reverse;
-}
-
-.decorativeDot1 {
-  position: absolute;
-  top: 60%;
-  left: 5%;
-  width: 0.75rem;
-  height: 0.75rem;
-  background: radial-gradient(circle, #22d3ee 0%, #0891b2 100%);
-  border-radius: 50%;
-  animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite, pulse 3s ease-in-out infinite;
-  box-shadow: 0 0 20px rgba(34, 211, 238, 0.6);
-}
-
-.decorativeDot2 {
-  position: absolute;
-  top: 25%;
-  right: 10%;
-  width: 0.75rem;
-  height: 0.75rem;
-  background: radial-gradient(circle, #c084fc 0%, #9333ea 100%);
-  border-radius: 50%;
-  animation: ping 2.5s cubic-bezier(0, 0, 0.2, 1) infinite, pulse 4s ease-in-out infinite;
-  box-shadow: 0 0 20px rgba(192, 132, 252, 0.6);
-}
-
 .gradientOverlay {
   position: absolute;
   top: -10%;
@@ -155,7 +217,7 @@ html, body {
   animation: gradientFloat 20s ease-in-out infinite;
 }
 
-/* Advanced animations */
+/* Animations */
 @keyframes gradientShift {
   0%, 100% {
     background-position: 0% 50%;
@@ -176,39 +238,14 @@ html, body {
   }
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-20px) rotate(5deg);
-  }
-}
-
-@keyframes glow {
+@keyframes fadeInDown {
   from {
-    box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+    opacity: 0;
+    transform: translateY(-10px);
   }
   to {
-    box-shadow: 0 0 40px rgba(34, 211, 238, 0.4);
-  }
-}
-
-@keyframes ping {
-  75%, 100% {
-    transform: scale(2.5);
-    opacity: 0;
-  }
-}
-
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
     opacity: 1;
-  }
-  50% {
-    transform: scale(1.2);
-    opacity: 0.8;
+    transform: translateY(0);
   }
 }
 
@@ -242,28 +279,48 @@ html, body {
     justify-content: center;
     align-items: center;
     gap: 1rem;
+    flex-direction: column;
   }
   
   .logoSection {
     flex: none;
-    margin-bottom: 0;
+    margin-bottom: 1rem;
+  }
+  
+  .userSection {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .usernameButton {
+    min-width: 140px;
+  }
+  
+  .dropdown {
+    right: 50%;
+    transform: translateX(50%);
   }
   
   .titleSection {
-    margin-bottom: 0rem;
-  }
-  
-  .decorativeCircle1,
-  .decorativeCircle2 {
-    opacity: 0.7;
+    margin-bottom: 2rem;
   }
 }
 
-/* Additional responsive breakpoints for logo and text scaling */
+/* Additional responsive breakpoints */
 @media (max-width: 600px) {
   .title {
     padding: 0 0.5rem;
     gap: 0.75rem;
+  }
+  
+  .usernameButton {
+    min-width: 120px;
+    font-size: 13px;
+  }
+  
+  .username {
+    max-width: 80px;
   }
 }
 
@@ -271,6 +328,16 @@ html, body {
   .title {
     padding: 0 0.25rem;
     gap: 0.5rem;
+  }
+  
+  .usernameButton {
+    min-width: 100px;
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+  
+  .username {
+    max-width: 60px;
   }
 }
 

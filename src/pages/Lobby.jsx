@@ -1,40 +1,81 @@
-// src/pages/Lobby.jsx
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React from 'react';
+import styles from './Lobby.module.css';
+import { useLocation } from 'react-router-dom';
+import StarryBackground from '../components/StarryBackground/StarryBackground';
+import Logo from '../components/Logo/Logo';
 
-const Lobby = () => {
-  const [players] = useState(['Player1', 'Player2', 'Player3']); // Mock data
-  const navigate = useNavigate();
-  const roomCode = "dddddd"
-  const startGame = () => {
-    navigate(`/coding/${roomCode}`);
-  };
+const Lobby = ({ onBackToLanding, onStartGame, isHost = true }) => {
+  const location = useLocation();
+  const roomData = location.state?.roomData || {};
 
   return (
-    <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
-      <h1>🎮 Lobby Page</h1>
-      <div style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '5px', marginBottom: '20px' }}>
-        <h3>Room: Coding Challenge #123</h3>
-        <p>Waiting for players to join...</p>
-        <div style={{ marginTop: '15px' }}>
-          <h4>Players ({players.length}/4):</h4>
-          <ul style={{ listStyle: 'none', padding: 0 }}>
-            {players.map((player, index) => (
-              <li key={index} style={{ padding: '5px 0', backgroundColor: '#e9ecef', margin: '5px 0', paddingLeft: '10px', borderRadius: '3px' }}>
-                👤 {player}
-              </li>
-            ))}
-          </ul>
+    <div className={styles.container}>
+      <StarryBackground/>
+      <div className={styles.logo}>
+        <Logo/>
+      </div>
+
+      {/* Main Content */}
+      <main className={styles.main}>
+        <div className={styles.card}>
+          <div className={styles.grid}>
+            {/* Instructions */}
+            <section className={styles.section}>
+              <h2 className={styles.sectionTitle}>Instructions</h2>
+              <ol className={styles.list} role="list">
+                <li><span>1.</span> Both players solve the same set of DSA problems within a fixed time.</li>
+                <li><span>2.</span> You can test your code during the match, but only the last submitted code is evaluated.</li>
+                <li><span>3.</span> Score is calculated after you submit all questions or when the time runs out.</li>
+                <li><span>4.</span> Test cases passed by your final submissions decide your score.</li>
+                <li><span>5.</span> The player with more passed test cases wins. If scores are equal, faster submission wins.</li>
+                <li><span>6.</span> No refreshing or external help allowed — fair play is mandatory.</li>
+              </ol>
+
+              {isHost ? (
+                <div className={styles.buttonContainer}>
+                  <button onClick={onStartGame} className={styles.startButton} aria-label="Start the game">
+                    START
+                  </button>
+                </div>
+              ) : (
+                <div className={styles.waitingMessage}>
+                  Waiting for host to start the game...
+                </div>
+              )}
+            </section>
+
+            {/* Room Details */}
+            <section className={styles.section}>
+              <h2 className={styles.sectionTitle}>Room Details</h2>
+              <dl className={styles.details}>
+                <div><dt>Room Code</dt><dd>{roomData?.roomCode || "N/A"}</dd></div>
+                <div><dt>Difficulty</dt><dd>{roomData?.difficulty || "N/A"}</dd></div>
+                <div><dt>Questions</dt><dd>{roomData?.num_questions || "N/A"}</dd></div>
+                <div><dt>Timer</dt><dd>{roomData?.timer || "N/A"} minutes</dd></div>
+              </dl>
+
+
+              <div className={styles.players}>
+                <h3>Players</h3>
+                <ul>
+                  {roomData?.players?.length > 0 ? (
+                    roomData.players.map((player, index) => (
+                      <li key={index}>
+                        <span>{index + 1}. {player.name}</span>
+                        {player.isHost && <span className={styles.hostBadge}>HOST</span>}
+                      </li>
+                    ))
+                  ) : (
+                    <li>No players found</li>
+                  )}
+                </ul>
+              </div>
+            </section>
+          </div>
         </div>
-      </div>
-      <div style={{ textAlign: 'center', gap: '10px', display: 'flex', justifyContent: 'center' }}>
-        <button onClick={startGame} style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-          Start Game
-        </button>
-        <Link to="/" style={{ padding: '10px 20px', backgroundColor: '#dc3545', color: 'white', textDecoration: 'none', borderRadius: '5px' }}>
-          Leave Room
-        </Link>
-      </div>
+      </main>
+
+      <div className={styles.gradientOverlay} aria-hidden="true"></div>
     </div>
   );
 };
