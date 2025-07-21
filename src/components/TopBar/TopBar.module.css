@@ -1,0 +1,64 @@
+.topBar {
+  width: 100%;
+  background: white;
+  box-shadow: 0 4px 16px rgba(30, 41, 59, 0.10);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+.left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.05rem;
+  color: #334155;
+}
+.label {
+  font-weight: 500;
+}
+.sep {
+  color: #94a3b8;
+  font-weight: bold;
+}
+.timer {
+  display: flex;
+  align-items: center;
+  background: #eff6ff;
+  color: #2563eb;
+  border-radius: 7px;
+  font-weight: 600;
+  padding: 0.2em 0.7em;
+  gap: 0.30em;
+  margin-left: 0.5rem;
+}
+.submitBtn {
+  margin-left: 1rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+@media (max-width: 700px) {
+  .topBar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    padding: 0.7rem 1rem;
+  }
+  .info {
+    font-size: 0.95rem;
+    gap: 0.5rem;
+  }
+}
