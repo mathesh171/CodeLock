@@ -1,0 +1,169 @@
+.resultCard {
+  background: rgba(30, 41, 59, 0.91);
+  border: 1.5px solid rgba(59, 130, 246, 0.17);
+  border-radius: 18px;
+  padding: 2.5rem 2rem;
+  margin-top: 1rem;
+  min-width: 350px;
+  max-width: 95vw;
+  box-shadow: 0 18px 40px -10px rgba(0,0,0,0.22);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.headingResult {
+  color: #fafafa;
+  margin-bottom: 1.35rem;
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: .02em;
+}
+
+.winnerBanner {
+  margin-bottom: 18px;
+  font-size: 1.25em;
+  color: #4ade80;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+.loserBanner {
+  margin-bottom: 18px;
+  font-size: 1.15em;
+  color: #f87171;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+
+.tableWrapper {
+  background: rgba(248,249,250,.07);
+  width: 100%;
+  border-radius: 9px;
+  padding: 16px 10px 22px 10px;
+  margin-bottom: 20px;
+}
+
+.tableTitle {
+  text-align: left;
+  color: #60a5fa;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+  padding-left: 2px;
+}
+
+.resultTable {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(27,38,54, 0.98);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 3px 18px -3px #0003;
+  margin-top: 10px;
+}
+
+.resultTable th,
+.resultTable td {
+  padding: 0.85rem 1.2rem;
+  text-align: left;
+  color: #e0e7ef;
+  border: 1px solid #39476433;
+}
+
+.resultTable th {
+  background: linear-gradient(90deg,#3686f7 0%, #00b3ff 100%);
+  color: #fff;
+  font-size: 1.10rem;
+  font-weight: 700;
+  border-bottom: 2px solid #697fef44;
+}
+
+.resultTable tr:nth-child(odd) td {
+  background: rgba(100,116,139,0.13);
+}
+
+.resultTable tr:nth-child(even) td {
+  background: rgba(71,85,105, 0.08);
+}
+
+.winnerRow td {
+  background: #183f32 !important;
+  color: #4ade80 !important;
+  font-weight: 700;
+}
+
+.boldCell {
+  font-weight: bold;
+  color: #a78bfa;
+}
+
+.actionLinks {
+  width: 100%;
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  margin-top: 2.5rem;
+}
+
+.dashboardBtn {
+  padding: 10px 20px;
+  background: linear-gradient(45deg, #2563eb, #0eacef 75%);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+  letter-spacing: .01em;
+  font-size: 1.09rem;
+  transition: filter 0.18s;
+  border: none;
+  box-shadow: 0 3px 16px -6px #38bdf844;
+}
+
+.dashboardBtn:hover {
+  filter: brightness(1.1) saturate(1.21);
+}
+
+.newGameBtn {
+  padding: 10px 20px;
+  background: linear-gradient(90deg, #059669, #3de48e 70%);
+  color: #1e293b;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+  letter-spacing: .01em;
+  font-size: 1.09rem;
+  transition: filter 0.18s;
+  border: none;
+  box-shadow: 0 3px 16px -6px #4ade8044;
+}
+
+.newGameBtn:hover {
+  filter: brightness(1.1) saturate(1.21);
+  color: #0f172a;
+}
+
+@media (max-width: 700px) {
+  .resultCard {
+    padding: 1.2rem 0.7rem;
+    min-width: 90vw;
+    border-radius: 12px;
+    margin-top: 1.2rem;
+  }
+  .resultTable th, .resultTable td {
+    padding: 0.65rem 0.5rem;
+    font-size: 0.99rem;
+  }
+  .tableWrapper {
+    padding: 7px 3px 12px 3px;
+  }
+  .actionLinks {
+    flex-direction: column;
+    gap: 9px;
+    margin-top: 1.3rem;
+  }
+}

@@ -1,0 +1,58 @@
+.container {
+  min-height: 100vh;
+  position: relative;
+  background: linear-gradient(135deg, #050a10 0%, #182446 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  overflow: hidden;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  align-items: left;
+  padding: 2rem 3rem 0 3rem;
+  z-index: 10;
+}
+
+.logoWrapper {
+  display: flex;
+  align-items: center;
+  margin-right: 2rem;
+}
+
+
+
+.mainContent {
+  flex: 1;
+  min-height: 60vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 0rem;
+  z-index: 10;
+  margin-bottom: 10rem;
+}
+
+@media (max-width: 700px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.5rem 1rem 0 1rem;
+  }
+  .title {
+    font-size: 1.3rem;
+    margin-top: 0.65rem;
+  }
+  .titleWrapper {
+    margin-top: 0.8rem;
+  }
+  .mainContent {
+    margin-top: 1rem;
+  }
+}
