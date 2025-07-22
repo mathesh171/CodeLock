@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function QuestionSection() {
+export default function CodeEditor() {
   return (
     <div>
       

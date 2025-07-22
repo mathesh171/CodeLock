@@ -1,44 +1,17 @@
+// src/context/RoomContext.jsx
+import React, { createContext, useState, useContext } from 'react';
 
-import React, { createContext, useContext, useState } from "react";
-
-const RoomContext = createContext(undefined);
+const RoomContext = createContext();
 
 export const RoomProvider = ({ children }) => {
-  const [roomCode, setRoomCode] = useState(null);
-  const [questions, setQuestions] = useState([]);
-  const [roomInfo, setRoomInfo] = useState(null);
-
-  const handleRoomInfoUpdate = (info) => {
-    setRoomInfo(info);
-    setRoomCode(info.room_code);
-    if (info.questions && Array.isArray(info.questions)) {
-      setQuestions(info.questions);
-    }
-  };
-
-  const contextValue = {
-    roomCode,
-    setRoomCode,
-    questions,
-    setQuestions,
-    roomInfo,
-    setRoomInfo,
-    handleRoomInfoUpdate
-  };
+  const [roomCode, setRoomCode] = useState('');
+  const [isHost, setIsHost] = useState(false);
 
   return (
-    <RoomContext.Provider value={contextValue}>
+    <RoomContext.Provider value={{ roomCode, setRoomCode, isHost, setIsHost }}>
       {children}
     </RoomContext.Provider>
   );
 };
 
-export const useRoom = () => {
-  const ctx = useContext(RoomContext);
-  if (!ctx) {
-    throw new Error('useRoom must be used within RoomProvider');
-  }
-  return ctx;
-};
-
-export default RoomContext;
+export const useRoom = () => useContext(RoomContext);
