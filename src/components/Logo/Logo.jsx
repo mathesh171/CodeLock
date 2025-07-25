@@ -6,12 +6,15 @@ import { useNavigate, useLocation } from 'react-router-dom';
 const Logo = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const isCodingPage = location.pathname.startsWith('/coding/');
   
   const home = () => {
     if (location.pathname !== '/') {
       navigate('/');
     }
   }
+
   
   return (
     <div 
@@ -19,7 +22,8 @@ const Logo = () => {
       onClick={home}
     >
       <img src={logo} alt="Logo" className={styles.logoImage}/>
-      <h1 className={styles.logoText}>CODELOCK</h1>
+          <h1 className={`${styles.logoText} ${isCodingPage ? styles.codingColor : ''}`}>
+          CODELOCK</h1>
     </div>
   );
 };
