@@ -103,11 +103,12 @@ const TopBar = ({ username, roomCode, onSubmitTest }) => {
       <div className={styles.right}>
         <div className={styles.info} aria-live="polite">
           <span className={styles.label}>{username}</span>
-          <span className={styles.sep} aria-hidden="true">/</span>
+          <span className={styles.sep} aria-hidden="true">|</span>
           <span className={styles.label}>Room: <b>{roomCode}</b></span>
           <span className={styles.sep} aria-hidden="true">|</span>
+          <span className={styles.label}>Time Left: </span>
           <span className={styles.timer} aria-label={formatTime(timeLeft)}>
-            Time Left: {formatTime(timeLeft)}
+            {formatTime(timeLeft)}
           </span>
         </div>
         <Button 
