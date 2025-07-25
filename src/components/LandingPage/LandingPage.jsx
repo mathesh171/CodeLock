@@ -12,7 +12,6 @@ const LandingPage = ({ onCreateChallenge, onJoinChallenge, onLogin }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -26,7 +25,7 @@ const LandingPage = ({ onCreateChallenge, onJoinChallenge, onLogin }) => {
     };
   }, []);
 
-  // Close dropdown when pressing Escape key
+
   useEffect(() => {
     const handleEscape = (event) => {
       if (event.key === 'Escape') {
@@ -52,16 +51,16 @@ const LandingPage = ({ onCreateChallenge, onJoinChallenge, onLogin }) => {
   const handleLogout = () => {
     setIsDropdownOpen(false);
     logout();
-    navigate('/'); // Ensure user stays on home page after logout
+    navigate('/'); 
   };
 
   return (
     <div className={styles.container}>
       <BackgroundEffects />
 
-      {/* Main content */}
+      
       <main className={styles.main}>
-        {/* Logo section */}
+        
         <div className={styles.title}>
           <div className={styles.logoSection}>
             <Logo responsive={true} />

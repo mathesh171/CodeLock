@@ -10,7 +10,6 @@ import RecentGamesTable from '../RecentGamesTable/RecentGamesTable';
 import Logo from '../Logo/Logo';
 import styles from './Dashboard.module.css';
 
-// Move userData and username above all code that uses them
 let userData = null;
 try {
   const stored = localStorage.getItem('authUser');
@@ -32,7 +31,7 @@ const Dashboard = () => {
   const [recentGames, setRecentGames] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Check if demo user
+
   const isDemoUser = localStorage.getItem('isDemoUser') === 'true';
 
   useEffect(() => {
@@ -64,7 +63,6 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         if (isDemoUser) {
-          // Generate demo data
           const demoProfile = {
             username: 'demo_user',
             email: 'demo@example.com',
@@ -78,13 +76,11 @@ const Dashboard = () => {
           return;
         }
 
-        // Fetch user profile
         const profileResponse = await axios.get(
           `http://localhost:8084/api/users/profile/username/${username}`
         );
         setProfile(profileResponse.data);
 
-        // Fetch recent matches (you'll need to implement this endpoint)
         try {
           const matchesResponse = await axios.get(
             `http://localhost:8084/api/users/matches/${username}`
@@ -165,18 +161,15 @@ const Dashboard = () => {
     }
   };
 
-  // Generate stats based on available data
   const stats = {};
   if (profile?.totalmatch !== undefined) stats.gamesPlayed = profile.totalmatch;
   if (profile?.wins !== undefined) stats.wins = profile.wins;
   if (profile?.losses !== undefined) stats.losses = profile.losses;
   
-  // Calculate win percentage if we have wins and total matches
   if (profile?.wins !== undefined && profile?.totalmatch !== undefined && profile.totalmatch > 0) {
     stats.winPercentage = Math.round((profile.wins / profile.totalmatch) * 100);
   }
 
-  // Redirect or message if user is not logged in and not demo user
   if (!username && !isDemoUser) {
     return (
       <div className={styles.container}>

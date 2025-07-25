@@ -1,4 +1,3 @@
-// src/pages/CreateRoom.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../components/Logo/Logo';
@@ -43,7 +42,6 @@ const CreateRoom = () => {
 
       setMessage("");
       const result = await createRoom(roomData);
-      // If result looks like a room code, navigate to lobby
       if (/^[a-zA-Z0-9]{6,}$/.test(result)) {
         navigate(`/lobby/${result}`, {
           state: {

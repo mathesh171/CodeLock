@@ -2,7 +2,6 @@ import React from 'react';
 import styles from './BackgroundEffects.module.css';
 
 const BackgroundEffects = () => {
-  // Generate stars
   const stars = [...Array(100)].map((_, i) => (
     <div
       key={`star-${i}`}
@@ -14,8 +13,6 @@ const BackgroundEffects = () => {
       }}
     />
   ));
-
-  // Generate particles
   const particles = [...Array(20)].map((_, i) => (
     <div
       key={`particle-${i}`}
@@ -30,12 +27,9 @@ const BackgroundEffects = () => {
 
   return (
     <div className={styles.backgroundContainer}>
-      {/* Starry background */}
       <div className={styles.starsContainer} aria-hidden="true">
         {stars}
       </div>
-
-      {/* Animated background particles */}
       <div className={styles.particlesContainer} aria-hidden="true">
         {particles}
       </div>

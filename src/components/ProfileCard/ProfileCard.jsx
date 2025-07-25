@@ -101,7 +101,7 @@ const ProfileCard = ({
                 )}
               </div>
 
-              {/* Email Field */}
+              
               <div className={styles.infoItem}>
                 <div className={styles.labelContainer}>
                   <span className={styles.label}>Email:</span>
@@ -141,7 +141,7 @@ const ProfileCard = ({
                 )}
               </div>
 
-              {/* Password Field */}
+              
               <div className={styles.infoItem}>
                 <div className={styles.labelContainer}>
                   <span className={styles.label}>Password:</span>

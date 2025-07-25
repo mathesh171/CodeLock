@@ -9,16 +9,21 @@
   position: sticky;
   top: 0;
   z-index: 30;
+  height: 56px;
+  
 }
 .left {
   display: flex;
   align-items: center;
+  margin-top: 1rem;
   gap: 1rem;
 }
 .right {
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 .info {
   display: flex;
@@ -49,6 +54,7 @@
   margin-left: 1rem;
   padding-left: 2rem;
   padding-right: 2rem;
+  white-space: nowrap;
 }
 @media (max-width: 700px) {
   .topBar {
@@ -56,6 +62,7 @@
     align-items: stretch;
     gap: 1rem;
     padding: 0.7rem 1rem;
+    height: auto;
   }
   .info {
     font-size: 0.95rem;

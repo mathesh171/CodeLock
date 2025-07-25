@@ -1,4 +1,3 @@
-// src/components/JoinButton/JoinButton.jsx
 import React from 'react';
 import Button from '../Button/Button';
 import styles from './JoinButton.module.css';

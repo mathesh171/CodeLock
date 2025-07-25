@@ -1,7 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-// Import all page components
 import Home from '../pages/Home';
 import Login from '../pages/Login';
 import CreateRoom from '../pages/CreateRoom';
@@ -22,7 +21,6 @@ const AppRoutes = () => {
       <Route path="/coding/:roomCode" element={<CodingArea />} />
       <Route path="/result/:roomCode" element={<Result />} />
       <Route path="/dashboard" element={<Dashboard />} />
-      {/* Catch all route for 404 */}
       <Route path="*" element={<div style={{padding: '20px', textAlign: 'center'}}>
         <h2>404 - Page Not Found</h2>
         <p>The page you're looking for doesn't exist.</p>

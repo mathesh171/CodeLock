@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import styles from './Lobby.module.css';
+import styles from '../pageStyles/Lobby.module.css';
 import { useLocation, useNavigate } from 'react-router-dom';
 import StarryBackground from '../components/StarryBackground/StarryBackground';
 import Logo from '../components/Logo/Logo';
@@ -29,7 +29,6 @@ const Lobby = ({ onBackToLanding, onStartGame }) => {
       code
     );
 
-    // requestRoomInfo(code); <-- Now handled inside connectWebSocket after subscribing
 
     return () => {
       disconnectWebSocket();
@@ -63,7 +62,7 @@ const Lobby = ({ onBackToLanding, onStartGame }) => {
   };
   const authUser = JSON.parse(localStorage.getItem('authUser'));
 
-  // Assemble players from host and guest user IDs (no array by default in server object)
+
   const players = [
     liveRoomData.host_user_id && {
       name: liveRoomData.host_user_id.username,
@@ -87,11 +86,11 @@ const Lobby = ({ onBackToLanding, onStartGame }) => {
         <Logo />
       </div>
 
-      {/* Main Content */}
+    
       <main className={styles.main}>
         <div className={styles.card}>
           <div className={styles.grid}>
-            {/* Instructions */}
+            
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Instructions</h2>
               <ol className={styles.list} role="list">
@@ -122,7 +121,7 @@ const Lobby = ({ onBackToLanding, onStartGame }) => {
               )}
             </section>
 
-            {/* Room Details */}
+            
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Room Details</h2>
               <dl className={styles.details}>

@@ -25,6 +25,7 @@
   border: 1px solid #dbeafe;
   background: #e0e7ff;
   color: #373c49;
+  cursor: pointer;
 }
 .editorOuter {
   border-radius: 10px;
@@ -48,7 +49,34 @@
   overflow-y: auto;
 }
 
-/* Responsive */
+.resultTable {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #000;
+  background: white;
+  color: black;
+}
+
+.resultTable th,
+.resultTable td {
+  border: 1px solid black;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.passed {
+  color: green;
+  font-weight: 700;
+  text-align: center;
+}
+
+.failed {
+  color: red;
+  font-weight: 700;
+  text-align: center;
+}
+
+
 @media (max-width: 1000px) {
   .editorBox { max-width: 98vw; min-width: unset; margin: 1rem 0; }
 }

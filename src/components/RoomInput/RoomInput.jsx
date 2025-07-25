@@ -1,11 +1,10 @@
-// src/components/RoomInput/RoomInput.jsx
 import React from 'react';
 import styles from './RoomInput.module.css';
 
 const RoomInput = ({ roomCode, setRoomCode }) => {
   const handleChange = (e) => {
     const value = e.target.value.toUpperCase();
-    setRoomCode(value.replace(/[^A-Z0-9]/g, '')); // Only allow alphanumeric
+    setRoomCode(value.replace(/[^A-Z0-9]/g, ''));
   };
 
   return (
@@ -22,7 +21,7 @@ const RoomInput = ({ roomCode, setRoomCode }) => {
           onChange={handleChange}
           placeholder="Enter code here..."
           className={styles.input}
-          maxLength={6} // Match your backend room code length
+          maxLength={6} 
           aria-describedby="room-code-help"
         />
         <div id="room-code-help" className={styles.srOnly}>

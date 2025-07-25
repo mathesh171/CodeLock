@@ -124,7 +124,7 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Responsive Design */
+
 @media (min-width: 768px) {
   .content {
     padding: 3rem;

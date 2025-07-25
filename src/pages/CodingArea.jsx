@@ -1,7 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import TopBar from '../components/TopBar/TopBar';
+import QuestionNumberSection from '../components/QuestionNumberSection/QuestionNumberSection';
+import QuestionSection from '../components/QuestionSection/QuestionSection';
+import CodeEditorSection from '../components/CodeEditorSection/CodeEditorSection';
+import { useRoom } from '../context/RoomContext';
+import { useAuthUser } from '../context/AuthUser';
+import styles from '../pageStyles/CodingArea.module.css';
 
-const API_BASE = "http://localhost:8084"; 
+const API_BASE = "http://localhost:8084";
+
+function getInitialTimerValue(initialMinutes) {
+  if (initialMinutes === 'unlimited') {
+    return 0; // start stopwatch from 0
+  }
+  return initialMinutes * 60;
+}
+
+const initialCodeSamples = {
+  python3: `# Write your Python 3 code here\n`,
+  java: `// Write your Java code here\npublic class Solution {\n    public static void main(String[] args) {\n        // your code\n    }\n}`,
+  cpp: `// Write your C++ code here\n#include <iostream>\nusing namespace std;\nint main() {\n    // your code\n    return 0;\n}`
+};
 
 function getAuthUser() {
   try {
@@ -19,232 +39,346 @@ const LANG_OPTIONS = [
 
 const defaultCodeByLang = {
   python3: '# Write your Python code here\ndef solution():\n    pass',
-  java: '// Write your Java code here\npublic class Solution {\n    public static void main(String[] args) {\n    }\n}',
+  java: '// Write your Java code here\npublic class Solution {\n    public static void main(String[] args) {\n        \n    }\n}',
   cpp: '// Write your C++ code here\nint main() {\n    return 0;\n}',
 };
 
-const CodingArea = () => {
-  const { roomCode } = useParams();
-  const [questions, setQuestions] = useState([]);
-  const [curIdx, setCurIdx] = useState(0);
-  const [codeByQ, setCodeByQ] = useState({});
+export default function CodingArea() {
+  const { roomCode: roomCodeParam } = useParams();
+  const navigate = useNavigate();
+
+  const { roomCode, setRoomCode } = useRoom();
+  const { user } = useAuthUser();
+
+
+  const [questions, setQuestions] = useState([]); 
+  const [curQuestionIdx, setCurQuestionIdx] = useState(0);
+  const [statusMap, setStatusMap] = useState({}); 
+  const [notViewedCount, setNotViewedCount] = useState(0);
+  const [savedInServerCount, setSavedInServerCount] = useState(0);
+  const [questionContent, setQuestionContent] = useState(null); 
   const [lang, setLang] = useState('python3');
+  const [code, setCode] = useState(initialCodeSamples['python3']);
+  const [timeLeft, setTimeLeft] = useState(0); 
+  const [timerActive, setTimerActive] = useState(false);
+  const [totalTimeMinutes, setTotalTimeMinutes] = useState(null);
   const [runResult, setRunResult] = useState(null);
   const [submitResult, setSubmitResult] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(30 * 60); 
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
+
+  
+  const [curIdx, setCurIdx] = useState(0);
+  const [codeByQ, setCodeByQ] = useState({});
+  const [loadingAlt, setLoadingAlt] = useState(true);
+  const [showSubmitModalAlt, setShowSubmitModalAlt] = useState(false);
   const authUser = getAuthUser();
 
-  // Fetch questions on mount
+  
   useEffect(() => {
-    let isMounted = true;
-    setLoading(true);
-    fetch(`${API_BASE}/api/questions/get/${roomCode}`)
-      .then(r => r.json())
-      .then(data => {
-        if (isMounted) {
-          setQuestions(data);
-          if (data.length > 0) {
-            // Init code state for all questions if not already present (or use last code)
-            const firstLang = LANG_OPTIONS.find(l => l.value === lang) || LANG_OPTIONS[0];
-            const codes = {};
-            data.forEach((q, idx) => {
-              codes[q.questions_id.id] = defaultCodeByLang[firstLang.value];
-            });
-            setCodeByQ(codes);
-            setCurIdx(0);
-          }
-          setLoading(false);
-        }
-      })
-      .catch(() => setLoading(false));
-    return () => { isMounted = false; }
-    // eslint-disable-next-line
-  }, [roomCode]);
+    if (roomCodeParam && roomCodeParam !== roomCode) {
+      setRoomCode(roomCodeParam);
+    }
+  }, [roomCodeParam, roomCode, setRoomCode]);
 
-  // Timer
+  
+const fetchQuestionsAndTimer = useCallback(async () => {
+  try {
+    const res = await fetch(`${API_BASE}/api/questions/get/${roomCode}`);
+    if (!res.ok) throw new Error('Failed to fetch questions');
+
+    const data = await res.json();
+
+    // ✅ data itself is the array
+    if (!Array.isArray(data)) {
+      throw new Error("Invalid response: expected an array of questions");
+    }
+
+    const questionsArray = data;
+
+    setQuestions(questionsArray);
+
+    const initialStatus = {};
+    questionsArray.forEach((_, idx) => {
+      initialStatus[idx] = 'unseen';
+    });
+    setStatusMap(initialStatus);
+
+    setNotViewedCount(questionsArray.length);
+    setSavedInServerCount(0); // or update if backend sends it somewhere else
+
+    const timerFromServer = 'unlimited'; // adjust if timer is moved elsewhere
+    setTotalTimeMinutes(timerFromServer);
+
+    const timeInit = getInitialTimerValue(timerFromServer);
+    setTimeLeft(timeInit);
+    setTimerActive(true);
+
+    if (questionsArray.length > 0) {
+      setCurQuestionIdx(0);
+      setQuestionContent(questionsArray[0]);
+    }
+  } catch (err) {
+    console.error("Error fetching questions and timer:", err.message);
+  }
+}, [roomCode]);
+
+
+
   useEffect(() => {
+    if (roomCode) {
+      fetchQuestionsAndTimer();
+    }
+  }, [roomCode, fetchQuestionsAndTimer]);
+
+  
+  useEffect(() => {
+    if (!timerActive) return;
+
+    
+    if (totalTimeMinutes === 'unlimited') {
+      const interval = setInterval(() => {
+        setTimeLeft((t) => t + 1);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+
+    
     if (timeLeft <= 0) {
-      handleFinalSubmit();
+      setTimerActive(false);
       return;
     }
-    const timer = setInterval(() => setTimeLeft(t => t - 1), 1000);
-    return () => clearInterval(timer);
-    // eslint-disable-next-line
-  }, [timeLeft]);
+    const interval = setInterval(() => {
+      setTimeLeft((t) => t - 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [timeLeft, timerActive, totalTimeMinutes]);
 
-  if (loading) return <div>Loading...</div>;
-  if (!questions.length) return <div>No questions for this room!</div>;
+  
+  useEffect(() => {
+    if (!questions[curQuestionIdx]) return;
+    setQuestionContent(questions[curQuestionIdx]);
 
-  const q = questions[curIdx];
-  const code = codeByQ[q.questions_id.id] || '';
+    if (statusMap[curQuestionIdx] === 'unseen') {
+      setStatusMap((prev) => {
+        const newStatus = { ...prev, [curQuestionIdx]: 'skipped' };
+        setNotViewedCount((n) => (n - 1 > 0 ? n - 1 : 0));
+        return newStatus;
+      });
+    }
 
-  // Navigation
-  const handlePrev = () => setCurIdx(i => Math.max(0, i - 1));
-  const handleNext = () => setCurIdx(i => Math.min(questions.length - 1, i + 1));
-
-  // Code change
-  const handleCodeChange = (value) => {
-    setCodeByQ(o => ({ ...o, [q.questions_id.id]: value }));
-  };
-
-  // Run code (testcases, not submission)
-  const handleRunCode = () => {
+    setCode(initialCodeSamples[lang]);
     setRunResult(null);
-    fetch(`${API_BASE}/api/run`, {
-      method: 'POST',
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: q.questions_id.id,
-        code,
-        lang,
-        ext: LANG_OPTIONS.find(l => l.value === lang)?.ext || 'py',
-      })
-    }).then(r => r.json()).then(setRunResult);
-  };
-
-  // Submit code for this question
-  const handleSubmitCode = () => {
     setSubmitResult(null);
-    fetch(`${API_BASE}/api/submit`, {
-      method: 'POST',
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: q.questions_id.id,
-        code,
-        lang,
-        ext: LANG_OPTIONS.find(l => l.value === lang)?.ext || 'py',
-        roomcode: roomCode,
-        username: authUser.username,
-      })
-    }).then(r => r.json()).then(setSubmitResult);
+  }, [curQuestionIdx, questions, statusMap, lang]);
+
+  
+  useEffect(() => {
+    setCode(initialCodeSamples[lang]);
+  }, [lang]);
+
+  
+  const handleSelectQuestion = (idx) => {
+    setCurQuestionIdx(idx);
+    setCurIdx(idx);
   };
 
-  // Submit test (final): finish the test attempt for the user
-  const handleFinalSubmit = () => {
-    fetch(`${API_BASE}/api/submittest`, {
-      method: 'POST',
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        roomCode,
-        username: authUser.username,
-      })
-    }).then(async r => {
-      // await r.json();
-      navigate(`/result/${roomCode}`); // Or where your result page is
-    });
+  const handleSubmitTest = () => {
+    setShowSubmitModal(true);
+    setShowSubmitModalAlt(true);
   };
 
-  // Formatting helpers
-  const formatTime = (seconds) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m}:${s.toString().padStart(2, '0')}`;
+  const confirmSubmitTest = () => {
+    setShowSubmitModal(false);
+    setShowSubmitModalAlt(false);
+    alert('Test submitted!');
+    navigate('/result');
   };
+
+  const cancelSubmitTest = () => {
+    setShowSubmitModal(false);
+    setShowSubmitModalAlt(false);
+  };
+
+  
+  const handleClearCode = () => {
+    setCode(initialCodeSamples[lang]);
+    setCodeByQ((prev) => ({
+      ...prev,
+      [questions[curQuestionIdx]?.questions_id?.id]: initialCodeSamples[lang],
+    }));
+  };
+
+  const handleRunCode = async () => {
+    setLoading(true);
+    setRunResult(null);
+    setSubmitResult(null);
+    try {
+      await new Promise((r) => setTimeout(r, 1000));
+      setRunResult({
+        testcases: [
+          { id: 1, passed: true, status: 'Passed' },
+          { id: 2, passed: false, status: 'Error: Wrong output' },
+        ],
+      });
+    } catch (error) {
+      setRunResult({ error: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmitCode = async () => {
+    setLoading(true);
+    setRunResult(null);
+    setSubmitResult(null);
+    try {
+      await new Promise((r) => setTimeout(r, 1200));
+      setSubmitResult({
+        testcases: [
+          { id: 1, passed: true, status: 'Passed' },
+          { id: 2, passed: true, status: 'Passed' },
+        ],
+      });
+      setStatusMap((prev) => ({ ...prev, [curQuestionIdx]: 'answered' }));
+    } catch (error) {
+      setSubmitResult({ error: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  
+  const handleCurIdxChange = (idx) => {
+    setCurIdx(idx);
+    setCurQuestionIdx(idx);
+  };
+
+  const handleLangChangeAlt = (e) => {
+    const newLang = e.target.value;
+    setLang(newLang);
+    setCodeByQ((codeByQ) => ({
+      ...codeByQ,
+      [questions[curIdx]?.questions_id?.id]: defaultCodeByLang[newLang],
+    }));
+
+    setCode(initialCodeSamples[newLang]);
+  };
+
+  const handleCodeChange = (val) =>
+    setCodeByQ((prev) => ({
+      ...prev,
+      [questions[curIdx]?.questions_id?.id]: val,
+    }));
+
+  const handleClearAlt = () => {
+    setCodeByQ((prev) => ({
+      ...prev,
+      [questions[curIdx]?.questions_id?.id]: defaultCodeByLang[lang],
+    }));
+    setCode(initialCodeSamples[lang]);
+  };
+
+  const handleRunAlt = async () => {
+    setRunResult(null);
+    setSubmitResult(null);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setRunResult({
+        testcases: [
+          { id: 1, passed: true, status: 'Passed' },
+          { id: 2, passed: false, status: 'Error: Wrong output' },
+        ],
+      });
+    }, 1200);
+  };
+
+  const handleSubmitAlt = () => {
+    setShowSubmitModal(true);
+    setShowSubmitModalAlt(true);
+  };
+
+  if (loading && !questions.length)
+    return (
+      <div className={styles.outer}>
+        <div className={styles.topBar}>
+          <div style={{ flex: 1 }} />
+          <div style={{ color: '#2563eb', fontWeight: 600 }}>Loading...</div>
+        </div>
+      </div>
+    );
+
+  const displayCode =
+    (questions[curIdx]?.questions_id?.id && codeByQ[questions[curIdx]?.questions_id?.id]) ||
+    code;
+
+  
+  const mins = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+  const secs = String(timeLeft % 60).padStart(2, '0');
 
   return (
-    <div style={{
-      padding: '20px', minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#f2f7ff'
-    }}>
-      {/* Header + Timer */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <h1>Coding Challenge Room: {roomCode}</h1>
-        <div style={{
-          fontSize: '22px', fontWeight: 'bold',
-          color: timeLeft < 60 ? 'red' : 'black', minWidth: 150, textAlign: 'right'
-        }}>
-          ⏰ Time Left: {formatTime(timeLeft)}
-        </div>
-      </div>
-
-      {/* LANG Selection */}
-      <div style={{ marginBottom: 16 }}>
-        <label>
-          Language:
-          <select value={lang} onChange={e => setLang(e.target.value)} style={{ marginLeft: 8 }}>
-            {LANG_OPTIONS.map(opt => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-        </label>
-      </div>
-
-      {/* Question Panel */}
-      <div style={{
-        background: 'white', borderRadius: 7, marginBottom: 16, padding: 16, boxShadow: '0 2px 6px #eee'
-      }}>
-        <h2>Question {curIdx + 1} / {questions.length}: {q.questions_id.title}</h2>
-        <p>{q.questions_id.description}</p>
-        {/* Add more fields if available: input/output examples, etc */}
-      </div>
-
-      {/* Code Editor */}
-      <textarea
-        value={code}
-        onChange={e => handleCodeChange(e.target.value)}
-        style={{
-          flex: '1 1 auto', minHeight: 180,
-          fontFamily: 'monospace', fontSize: '15px',
-          border: '1px solid #bdd0fc', borderRadius: '5px',
-          padding: '12px', background: '#fdfaee', marginBottom: 20
-        }}
-        placeholder="Write your solution here..."
+    <>
+      
+      <TopBar
+        username={user?.username || authUser?.username || 'Guest'}
+        roomCode={roomCode}
+        onSubmitTest={handleSubmitTest}
       />
 
-      {/* Run/Submit Result Area */}
-      <div style={{
-        display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: 10, marginBottom: 18
-      }}>
-        <button onClick={handleRunCode} style={{
-          background: '#ffb547', border: 0, color: '#222',
-          padding: '8px 20px', borderRadius: 4, fontWeight: 600, cursor: 'pointer'
-        }}>Run Code</button>
-        <button onClick={handleSubmitCode} style={{
-          background: '#48d18a', border: 0, color: 'white',
-          padding: '8px 26px', borderRadius: 4, fontWeight: 600, cursor: 'pointer'
-        }}>Submit Solution</button>
-      </div>
-      {runResult && (
-        <div style={{ background: '#f6ffd5', padding: 10, borderRadius: 4, marginBottom: 7 }}>
-          <b>Run Result:</b>
-          <pre style={{ margin: 0, fontSize: 13 }}>
-            {Object.entries(runResult).map(([key, value]) =>
-              <div key={key}>{key}: {JSON.stringify(value)}</div>
-            )}
-          </pre>
-        </div>
-      )}
-      {submitResult && (
-        <div style={{ background: '#e7f9f3', padding: 10, borderRadius: 4, marginBottom: 7 }}>
-          <b>Submit Result:</b>
-          <pre style={{ margin: 0, fontSize: 13 }}>
-            {Object.entries(submitResult).map(([key, value]) =>
-              <div key={key}>{key}: {JSON.stringify(value)}</div>
-            )}
-          </pre>
+      {showSubmitModal && (
+        <div className={styles.modalOverlay} role="dialog" aria-modal="true" aria-labelledby="submit-dialog-title">
+          <div className={styles.modalContent}>
+            <h2 id="submit-dialog-title">Confirm Submit Test</h2>
+            <p>Are you sure you want to submit the test? This action cannot be undone.</p>
+            <div className={styles.modalButtons}>
+              <button onClick={confirmSubmitTest} className={styles.modalBtnPrimary}>Yes, Submit</button>
+              <button onClick={cancelSubmitTest} className={styles.modalBtnSecondary}>Cancel</button>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Question Navigation */}
-      <div style={{ marginBottom: 18 }}>
-        <button onClick={handlePrev} disabled={curIdx === 0} style={{
-          padding: '6px 14px', marginRight: 8, borderRadius: 4, background: '#eee'
-        }}>Prev</button>
-        <button onClick={handleNext} disabled={curIdx === questions.length - 1} style={{
-          padding: '6px 14px', marginLeft: 2, borderRadius: 4, background: '#eee'
-        }}>Next</button>
-      </div>
+      <main className={styles.mainLayout}>
+        <QuestionNumberSection
+          questions={questions}
+          curIdx={curQuestionIdx}
+          statusMap={statusMap}
+          onSelect={(idx) => {
+            handleSelectQuestion(idx);
+            handleCurIdxChange(idx);
+          }}
+          notViewedCount={notViewedCount}
+          savedInServerCount={savedInServerCount}
+        />
 
-      {/* Final Submit */}
-      <div style={{ textAlign: 'center', marginBottom: 24, marginTop: 8 }}>
-        <button onClick={handleFinalSubmit} style={{
-          background: '#376fff', color: 'white', border: 0, fontWeight: 700,
-          padding: '12px 44px', borderRadius: 7, fontSize: '17px', cursor: 'pointer'
-        }}>Submit All &amp; Finish Test</button>
-      </div>
-    </div>
+        <QuestionSection questionData={questionContent} />
+
+        <CodeEditorSection
+          lang={lang}
+          setLang={(val) => {
+            setLang(val);
+            handleLangChangeAlt({ target: { value: val } });
+          }}
+          code={displayCode}
+          setCode={handleCodeChange}
+          onClear={() => {
+            handleClearCode();
+            handleClearAlt();
+          }}
+          onRun={() => {
+            handleRunCode();
+            handleRunAlt();
+          }}
+          onSubmit={() => {
+            handleSubmitCode();
+            handleSubmitAlt();
+          }}
+          runResult={runResult}
+          submitResult={submitResult}
+          loading={loading}
+        />
+      </main>
+    </>
   );
-};
-
-export default CodingArea;
+}

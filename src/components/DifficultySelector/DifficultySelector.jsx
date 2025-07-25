@@ -1,9 +1,8 @@
-// src/components/DifficultySelector/DifficultySelector.jsx
 import React from 'react';
 import styles from './DifficultySelector.module.css';
 
 const DifficultySelector = ({ roomSettings = {}, setRoomSettings }) => {
-  const difficulties = ['BEGINNER', 'EASY', 'MEDIUM', 'HARD']; // Uppercase to match backend enum
+  const difficulties = ['BEGINNER', 'EASY', 'MEDIUM', 'HARD'];
 
   const handleDifficultySelect = (difficulty) => {
     setRoomSettings(prev => ({ ...prev, difficulty }));

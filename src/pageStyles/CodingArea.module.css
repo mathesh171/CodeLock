@@ -1,0 +1,91 @@
+.mainLayout {
+  display: grid;
+  grid-template-columns: 90px 1fr 440px;
+  grid-template-rows: 56px auto; 
+  grid-template-areas:
+    "topBar topBar topBar"
+    "questionNumbers questionSection codeEditor";
+  height: 100vh;
+  width: 100vw;
+  gap: 0 0;
+  padding: 0;
+  margin: 0;
+  background-color: #1a202c;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+  .mainLayout {
+    grid-template-columns: 60px 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .mainLayout {
+    grid-template-columns: 1fr;
+    grid-template-rows: 56px auto 1fr 340px;
+    grid-template-areas:
+      "topBar"
+      "questionNumbers"
+      "questionSection"
+      "codeEditor";
+  }
+}
+
+/* Modal style */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 101;
+}
+
+.modalContent {
+  background: white;
+  padding: 2rem 3rem;
+  border-radius: 12px;
+  max-width: 400px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.modalButtons {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: space-around;
+}
+
+.modalBtnPrimary {
+  background: #2563eb;
+  border: none;
+  border-radius: 25px;
+  padding: 0.75rem 1.75rem;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.modalBtnPrimary:hover {
+  background: #1d4ed8;
+}
+
+.modalBtnSecondary {
+  background: #e5e7eb;
+  border: none;
+  border-radius: 25px;
+  padding: 0.75rem 1.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.modalBtnSecondary:hover {
+  background: #d1d5db;
+}

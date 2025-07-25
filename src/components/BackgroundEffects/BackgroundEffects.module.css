@@ -83,7 +83,7 @@
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite, particleFloat 6s linear infinite;
 }
 
-/* Variations for random directions */
+
 .star:nth-child(2n) {
   animation: twinkle 3.2s ease-in-out infinite, starFloat1 9s linear infinite;
 }
@@ -138,7 +138,7 @@
   }
 }
 
-/* Star movement animations - various directions */
+
 @keyframes starFloat {
   0% {
     transform: translate(0, 0) rotate(0deg);
@@ -184,7 +184,7 @@
   }
 }
 
-/* Particle movement animations - various directions */
+
 @keyframes particleFloat {
   0% {
     transform: translate(0, 0) rotate(0deg);
