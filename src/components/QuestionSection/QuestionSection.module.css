@@ -1,10 +1,9 @@
 .container {
   background: white;
-  padding: 1.5rem 2rem;
-  border-radius: 1.25rem;
+  grid-area: questionSection;
   box-shadow: 0 8px 20px rgba(30, 64, 175, 0.1);
   overflow-y: auto;
-  height: calc(100vh - 56px - 36px); 
+  height: 100%;
   max-width: 100%;
   color: #334155;
 }
@@ -12,10 +11,11 @@
 .title {
   font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 1rem;
+  margin: 1rem;
   color: #2563eb;
   border-bottom: 2px solid #60a5fa;
   padding-bottom: 0.3rem;
+  
 }
 
 .subHeading {
@@ -23,6 +23,7 @@
   font-size: 1.25rem;
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
+  margin-left: 1rem;
   text-decoration: underline;
   color: #1e40af;
 }
@@ -30,6 +31,7 @@
 .problemStatement {
   font-size: 1rem;
   line-height: 1.6;
+  margin-left: 1rem;
 }
 
 .codeBlock {

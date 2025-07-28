@@ -1,17 +1,16 @@
 .mainLayout {
   display: grid;
-  grid-template-columns: 90px 1fr 440px;
-  grid-template-rows: 56px auto; 
   grid-template-areas:
     "topBar topBar topBar"
     "questionNumbers questionSection codeEditor";
-  height: 100vh;
-  width: 100vw;
+  width: 100%;
   gap: 0 0;
   padding: 0;
   margin: 0;
   background-color: #1a202c;
   box-sizing: border-box;
+  grid-template-columns: 10% 45% 45%; 
+  grid-template-rows: auto 1fr; 
 }
 
 @media (max-width: 1024px) {

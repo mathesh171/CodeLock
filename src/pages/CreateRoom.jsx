@@ -28,7 +28,7 @@ const CreateRoom = () => {
         return;
       }
 
-      // Prepare room data for backend
+      
       const roomData = {
         difficulty: roomSettings.difficulty.toUpperCase(),
         num_questions: showCustomQuestions && roomSettings.customQuestions 

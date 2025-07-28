@@ -3,7 +3,6 @@ import styles from "./QuestionNumberSection.module.css";
 
 const statusColors = {
   answered: '#22c55e',    
-  bookmarked: '#f59e42',  
   skipped: '#ef4444',     
   unseen: '#cbd5e1'       
 };
@@ -33,18 +32,13 @@ const QuestionNumberSection = ({ questions, curIdx, statusMap, onSelect, notView
       <div className={styles.legendItem}>
         <span className={styles.dot} style={{ background: statusColors.answered }} aria-hidden="true" />Answered
       </div>
-      <div className={styles.legendItem}>
-        <span className={styles.dot} style={{ background: statusColors.bookmarked }} aria-hidden="true" />Bookmarked
-      </div>
+      
       <div className={styles.legendItem}>
         <span className={styles.dot} style={{ background: statusColors.skipped }} aria-hidden="true" />Skipped
       </div>
       <div className={styles.legendItem}>
         <span className={styles.dot} style={{ background: statusColors.unseen }} aria-hidden="true" />Not Viewed
         <span className={styles.count}>({notViewedCount})</span>
-      </div>
-      <div className={styles.legendItem}>
-        <span className={styles.savedText}>Saved in Server ({savedInServerCount})</span>
       </div>
     </div>
   </aside>

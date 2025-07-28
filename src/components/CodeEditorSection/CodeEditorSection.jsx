@@ -6,8 +6,16 @@ import MonacoEditor from "react-monaco-editor";
 const LANG_OPTIONS = [
   { value: 'python3', label: 'Python 3', ext: 'py' },
   { value: 'java', label: 'Java', ext: 'java' },
-  { value: 'cpp', label: 'C++', ext: 'cpp' }
+  { value: 'cpp', label: 'C++', ext: 'cpp' },
+  { value: 'c', label: 'C', ext: 'c' }
 ];
+
+const defaultCodeByLang = {
+  python3: '# Write your Python code here\ndef solution():\n    pass',
+  java: '// Write your Java code here\npublic class Solution {\n    public static void main(String[] args) {\n    }\n}',
+  cpp: '// Write your C++ code here\nint main() {\n    return 0;\n}',
+  c: '// Write your C code here\n#include <stdio.h>\nint main() {\n    printf("Hello, World!");\n    return 0;\n}'
+};
 
 const CodeEditorSection = ({
   lang, setLang,
@@ -24,7 +32,10 @@ const CodeEditorSection = ({
         id="lang"
         className={styles.dropdown}
         value={lang}
-        onChange={e => setLang(e.target.value)}
+        onChange={e => {
+          setLang(e.target.value);
+          setCode(defaultCodeByLang[e.target.value] || '');
+        }}
         aria-required="true"
       >
         {LANG_OPTIONS.map(l => (
@@ -34,8 +45,12 @@ const CodeEditorSection = ({
     </div>
     <div className={styles.editorOuter}>
       <MonacoEditor
-        language={lang === "python3" ? "python" : lang}
-        theme="vs-dark"
+        language={
+          lang === "python3" ? "python" :
+          lang === "cpp" ? "cpp" :
+          lang === "java" ? "java" : "c"
+        }
+        theme="leetcode-dark"
         value={code}
         onChange={setCode}
         options={{
@@ -45,6 +60,48 @@ const CodeEditorSection = ({
           automaticLayout: true,
         }}
         height="320px"
+        editorWillMount={(monaco) => {
+          
+          monaco.languages.registerCompletionItemProvider(lang, {
+            provideCompletionItems: () => ({
+              suggestions: [
+                {
+                  label: 'Scanner',
+                  kind: monaco.languages.CompletionItemKind.Class,
+                  insertText: 'Scanner',
+                  documentation: 'Java Scanner class',
+                },
+              ],
+            }),
+            triggerCharacters: ['S'],
+          });
+          monaco.editor.defineTheme('leetcode-dark', {
+            base: 'vs-dark',
+            inherit: true,
+            rules: [
+              { token: 'comment', foreground: '6A9955' },
+              { token: 'keyword', foreground: '569CD6' },
+              { token: 'number', foreground: 'B5CEA8' },
+              { token: 'string', foreground: 'CE9178' },
+              { token: 'operator', foreground: 'D4D4D4' },
+              { token: 'namespace', foreground: '4EC9B0' },
+              { token: 'type.identifier', foreground: '4EC9B0' },
+              { token: 'function', foreground: 'DCDCAA' },
+              { token: 'variable', foreground: '9CDCFE' },
+              { token: 'class', foreground: '4EC9B0' }
+            ],
+            colors: {
+              'editor.background': '#1e1e1e',
+              'editor.foreground': '#d4d4d4',
+              'editorLineNumber.foreground': '#858585',
+              'editorCursor.foreground': '#AEAFAD',
+              'editor.lineHighlightBackground': '#2a2d2e'
+            }
+          });
+        }}
+        editorDidMount={(editor, monaco) => {
+          monaco.editor.setTheme('leetcode-dark');
+        }}
       />
     </div>
     <div className={styles.btnRow}>
