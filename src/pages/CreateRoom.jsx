@@ -8,13 +8,7 @@ import { createRoom } from '../services/room';
 
 const CreateRoom = () => {
   const navigate = useNavigate();
-  const [roomSettings, setRoomSettings] = useState({
-    difficulty: 'Medium',
-    questions: 3,
-    timer: 30,
-    customQuestions: '',
-    customTimer: ''
-  });
+  const [roomSettings, setRoomSettings] = useState({});
   const [showCustomQuestions, setShowCustomQuestions] = useState(false);
   const [showCustomTimer, setShowCustomTimer] = useState(false);
   const [message, setMessage] = useState("");

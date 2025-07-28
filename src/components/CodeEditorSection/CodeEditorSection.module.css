@@ -9,6 +9,8 @@
   align-items: stretch;
   max-width: 540px;
   height: 100%;
+  overflow: auto;
+  position: relative;
 }
 .row {
   display: flex; 
@@ -38,7 +40,14 @@
 .btnRow {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 1em;
+  position: absolute;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  right: 1.5rem;
+  background: #f1f5fd;
+  z-index: 10;
 }
 .resultBox {
   background: #f3f5f6;
@@ -49,6 +58,115 @@
   margin-top: 1rem;
   max-height: 160px;
   overflow-y: auto;
+}
+.resultTable {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #000;
+  background: white;
+  color: black;
+}
+.resultTable th,
+.resultTable td {
+  border: 1px solid black;
+  padding: 8px 12px;
+  text-align: left;
+}
+.passed {
+  color: green;
+  font-weight: 700;
+  text-align: center;
+}
+.failed {
+  color: red;
+  font-weight: 700;
+  text-align: center;
+}
+
+.editorBox {
+  grid-area: codeEditor;
+  background: #f1f5fd;
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.09);
+  padding: 1.2rem;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  max-width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.editorInnerScroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.row, .label, .dropdown, .editorOuter {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Prevent horizontal scroll in editor content, wrap if needed */
+.editorOuter {
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(30, 58, 138, 0.10);
+  margin-bottom: 1.1rem;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.btnRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* Wrap buttons if viewport is narrow */
+  gap: 0.7em;
+  flex-wrap: wrap;
+  position: absolute;
+  left: 1.2rem;
+  right: 1.2rem;
+  bottom: 1.2rem;
+  z-index: 10;
+  background: #f1f5fd;
+  border-radius: 8px;
+  padding: 0.2em 0;
+}
+
+.btnRow > button {
+  flex: 1 1 0;
+  min-width: 115px;
+  max-width: 200px;
+}
+
+@media (max-width: 800px) {
+  .btnRow {
+    flex-direction: column;
+    position: static;
+    left: unset; right: unset; bottom: unset;
+    width: 100%;
+    gap: 0.6em;
+    padding: 0.2em 0;
+  }
+}
+
+.resultBox {
+  background: #f3f5f6;
+  color: #0a172a;
+  border-radius: 8px;
+  padding: 0.7em 0.9em;
+  font-size: 0.97rem;
+  margin-top: 1rem;
+  margin-bottom: 0.7rem;
+  /* Remove scroll from table itself; move to outer box */
+  max-height: unset;
+  overflow: unset;
 }
 
 .resultTable {
@@ -62,23 +180,25 @@
 .resultTable th,
 .resultTable td {
   border: 1px solid black;
-  padding: 8px 12px;
+  padding: 8px 8px;
   text-align: left;
+  word-break: break-word;
+  font-size: 1rem;
 }
 
 .passed {
-  color: green;
-  font-weight: 700;
+  color: #0e62be;
+  font-weight: 600;
   text-align: center;
 }
 
 .failed {
-  color: red;
-  font-weight: 700;
+  color: #e11d48;
+  font-weight: 600;
   text-align: center;
 }
 
-
 @media (max-width: 1000px) {
   .editorBox { max-width: 98vw; min-width: unset; margin: 1rem 0; }
+  .btnRow { position: static; left: unset; right: unset; bottom: unset; }
 }

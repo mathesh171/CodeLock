@@ -24,6 +24,7 @@
   scrollbar-gutter: stable;
 }
 
+
 .numberBtn {
   border: none;
   outline: none;
@@ -84,3 +85,16 @@
     padding: 1em 0.2em;
   }
 }
+
+.numberBtn {
+  font-size: 1rem;
+  width: 2.7rem;
+  height: 2.3rem;
+  border-radius: 0.55em;
+  padding: 0.16em 0.39em;
+}
+.statusDot {
+  width: 9px; height: 9px;
+  margin-right: 0.2em;
+}
+

@@ -20,108 +20,183 @@ const defaultCodeByLang = {
 const CodeEditorSection = ({
   lang, setLang,
   code, setCode,
-  onClear, onRun, onSubmit,
   runResult,
   submitResult,
-  loading
+  loading,
+  onRun,
+  onSubmit,
+  onClear,
+  onPrev,
+  onNext,
+  isPrevDisabled,
+  isNextDisabled,
+  totalQuestions
 }) => (
-  <aside className={styles.editorBox} aria-label="Code editor and controls">
-    <div className={styles.row}>
-      <label htmlFor="lang" className={styles.label}>Language:</label>
-      <select
-        id="lang"
-        className={styles.dropdown}
-        value={lang}
-        onChange={e => {
-          setLang(e.target.value);
-          setCode(defaultCodeByLang[e.target.value] || '');
-        }}
-        aria-required="true"
-      >
-        {LANG_OPTIONS.map(l => (
-          <option key={l.value} value={l.value}>{l.label}</option>
-        ))}
-      </select>
-    </div>
-    <div className={styles.editorOuter}>
-      <MonacoEditor
-        language={
-          lang === "python3" ? "python" :
-          lang === "cpp" ? "cpp" :
-          lang === "java" ? "java" : "c"
-        }
-        theme="leetcode-dark"
-        value={code}
-        onChange={setCode}
-        options={{
-          fontSize: 15,
-          minimap: { enabled: false },
-          scrollBeyondLastLine: false,
-          automaticLayout: true,
-        }}
-        height="320px"
-        editorWillMount={(monaco) => {
-          
-          monaco.languages.registerCompletionItemProvider(lang, {
-            provideCompletionItems: () => ({
-              suggestions: [
-                {
-                  label: 'Scanner',
-                  kind: monaco.languages.CompletionItemKind.Class,
-                  insertText: 'Scanner',
-                  documentation: 'Java Scanner class',
-                },
+  <aside className={styles.editorBox}>
+    <div className={styles.editorInnerScroll}>
+      <div className={styles.row}>
+        <label htmlFor="lang" className={styles.label}>Language:</label>
+        <select
+          id="lang"
+          className={styles.dropdown}
+          value={lang}
+          onChange={e => {
+            setLang(e.target.value);
+            setCode(defaultCodeByLang[e.target.value] || '');
+          }}
+          aria-required="true"
+        >
+          {LANG_OPTIONS.map(l => (
+            <option key={l.value} value={l.value}>{l.label}</option>
+          ))}
+        </select>
+      </div>
+      <div className={styles.editorOuter}>
+        <MonacoEditor
+          language={
+            lang === "python3" ? "python" :
+            lang === "cpp" ? "cpp" :
+            lang === "java" ? "java" : "c"
+          }
+          theme="leetcode-dark"
+          value={code}
+          onChange={setCode}
+          options={{
+            fontSize: 15,
+            minimap: { enabled: false },
+            scrollBeyondLastLine: false,
+            automaticLayout: true,
+            scrollbar: { horizontal: 'hidden', vertical: 'auto' },
+          }}
+          height="320px"
+          editorWillMount={(monaco) => {
+            monaco.languages.registerCompletionItemProvider(lang, {
+              provideCompletionItems: () => ({
+                suggestions: [
+                  {
+                    label: 'Scanner',
+                    kind: monaco.languages.CompletionItemKind.Class,
+                    insertText: 'Scanner',
+                    documentation: 'Java Scanner class',
+                  },
+                ],
+              }),
+              triggerCharacters: ['S'],
+            });
+            monaco.editor.defineTheme('leetcode-dark', {
+              base: 'vs-dark',
+              inherit: true,
+              rules: [
+                { token: 'comment', foreground: '6A9955' },
+                { token: 'keyword', foreground: '569CD6' },
+                { token: 'number', foreground: 'B5CEA8' },
+                { token: 'string', foreground: 'CE9178' },
+                { token: 'operator', foreground: 'D4D4D4' },
+                { token: 'namespace', foreground: '4EC9B0' },
+                { token: 'type.identifier', foreground: '4EC9B0' },
+                { token: 'function', foreground: 'DCDCAA' },
+                { token: 'variable', foreground: '9CDCFE' },
+                { token: 'class', foreground: '4EC9B0' }
               ],
-            }),
-            triggerCharacters: ['S'],
-          });
-          monaco.editor.defineTheme('leetcode-dark', {
-            base: 'vs-dark',
-            inherit: true,
-            rules: [
-              { token: 'comment', foreground: '6A9955' },
-              { token: 'keyword', foreground: '569CD6' },
-              { token: 'number', foreground: 'B5CEA8' },
-              { token: 'string', foreground: 'CE9178' },
-              { token: 'operator', foreground: 'D4D4D4' },
-              { token: 'namespace', foreground: '4EC9B0' },
-              { token: 'type.identifier', foreground: '4EC9B0' },
-              { token: 'function', foreground: 'DCDCAA' },
-              { token: 'variable', foreground: '9CDCFE' },
-              { token: 'class', foreground: '4EC9B0' }
-            ],
-            colors: {
-              'editor.background': '#1e1e1e',
-              'editor.foreground': '#d4d4d4',
-              'editorLineNumber.foreground': '#858585',
-              'editorCursor.foreground': '#AEAFAD',
-              'editor.lineHighlightBackground': '#2a2d2e'
-            }
-          });
-        }}
-        editorDidMount={(editor, monaco) => {
-          monaco.editor.setTheme('leetcode-dark');
-        }}
-      />
-    </div>
-    <div className={styles.btnRow}>
-      <Button variant="ternary" onClick={onClear} ariaLabel="Clear code editor">Clear</Button>
-      <Button variant="secondary" onClick={onRun} disabled={loading} ariaLabel="Compile and run code">Compile &amp; Run</Button>
-      <Button variant="primary" onClick={onSubmit} disabled={loading} ariaLabel="Submit code">Submit Code</Button>
-    </div>
-    {(runResult || submitResult) && (
+              colors: {
+                'editor.background': '#1e1e1e',
+                'editor.foreground': '#d4d4d4',
+                'editorLineNumber.foreground': '#858585',
+                'editorCursor.foreground': '#AEAFAD',
+                'editor.lineHighlightBackground': '#2a2d2e'
+              }
+            });
+          }}
+          editorDidMount={(editor, monaco) => {
+            monaco.editor.setTheme('leetcode-dark');
+          }}
+        />
+      </div>
       <div className={styles.resultBox} aria-live="polite" aria-atomic="true">
         <TestCasesResultTable runResult={runResult} submitResult={submitResult} />
       </div>
-    )}
+    </div>
+    <div className={styles.btnRow}>
+      <Button
+        variant="secondary"
+        className={styles.textBlue}
+        onClick={onPrev}
+        disabled={isPrevDisabled}
+        ariaLabel="Previous question"
+      >
+        Prev
+      </Button>
+      <Button
+        variant="ternary"
+        className={styles.textBlue}
+        onClick={onClear}
+        ariaLabel="Clear code editor"
+      >
+        Clear
+      </Button>
+      <Button
+        variant="secondary"
+        className={styles.textBlue}
+        onClick={onRun}
+        disabled={loading}
+        ariaLabel="Compile and run code"
+      >
+        Compile & Run
+      </Button>
+      <Button
+        variant="primary"
+        onClick={onSubmit}
+        disabled={loading}
+        ariaLabel="Submit code"
+      >
+        Submit Code
+      </Button>
+      <Button
+        variant="secondary"
+        className={styles.textBlue}
+        onClick={onNext}
+        disabled={isNextDisabled}
+        ariaLabel="Next question"
+      >
+        Next
+      </Button>
+    </div>
   </aside>
 );
 
 const TestCasesResultTable = ({ runResult, submitResult }) => {
-  const results = runResult?.testcases || submitResult?.testcases || [];
+  const getRows = () => {
+    if (runResult) {
+      const res = [];
+      for (let i = 1; i <= 2; i++) {
+        res.push({
+          id: i,
+          status: runResult[`testcase${i}status`] || '',
+          output: runResult[`testcase${i}op`] || '',
+          error: runResult[`testcase${i}error`] || '',
+        });
+      }
+      return res;
+    }
+    if (submitResult) {
+      const res = [];
+      for (let i = 1; i <= 2; i++) {
+        res.push({
+          id: i,
+          status: submitResult[`testcase${i}status`] || '',
+          output: submitResult[`testcase${i}op`] || '',
+          error: submitResult[`testcase${i}error`] || '',
+        });
+      }
+      return res;
+    }
+    return [];
+  };
 
-  if (results.length === 0) {
-    return <p>No test case results to display.</p>;
+  const rows = getRows();
+
+  if (!rows.length || (rows.length === 1 && !rows[0].status)) {
+    return null;
   }
 
   return (
@@ -129,18 +204,20 @@ const TestCasesResultTable = ({ runResult, submitResult }) => {
       <thead>
         <tr>
           <th>Testcase</th>
-          <th>Passed</th>
           <th>Status</th>
+          <th>Output</th>
+          <th>Error</th>
         </tr>
       </thead>
       <tbody>
-        {results.map(tc => (
-          <tr key={tc.id}>
-            <td>Testcase {tc.id}</td>
-            <td className={tc.passed ? styles.passed : styles.failed} aria-label={tc.passed ? "Passed" : "Failed"}>
-              {tc.passed ? '✔️' : '❌'}
+        {rows.map(r => (
+          <tr key={r.id}>
+            <td>{r.id}</td>
+            <td className={r.status === 'success' ? styles.passed : styles.failed}>
+              {r.status}
             </td>
-            <td>{tc.status}</td>
+            <td>{r.output}</td>
+            <td style={{ color: r.error ? 'red' : undefined }}>{r.error}</td>
           </tr>
         ))}
       </tbody>

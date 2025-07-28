@@ -1,16 +1,16 @@
 import React from "react";
 import styles from "./QuestionNumberSection.module.css";
-
 const statusColors = {
-  answered: '#22c55e',    
-  skipped: '#ef4444',     
-  unseen: '#cbd5e1'       
+  answered: '#22c55e',
+  skipped: '#ef4444',
+  unseen: '#cbd5e1'
 };
-
-const QuestionNumberSection = ({ questions, curIdx, statusMap, onSelect, notViewedCount = 0, savedInServerCount = 0 }) => (
+const QuestionNumberSection = ({
+  questions, curIdx, statusMap, onSelect, notViewedCount = 0, savedInServerCount = 0
+}) => (
   <aside className={styles.sidebar} aria-label="Question Number Navigation">
     <div className={styles.numbersList}>
-      {questions.map((q, idx) => (
+      {(questions || []).map((q, idx) => (
         <button
           key={String(q.questions_id?.id || idx)}
           onClick={() => onSelect(idx)}
@@ -32,7 +32,6 @@ const QuestionNumberSection = ({ questions, curIdx, statusMap, onSelect, notView
       <div className={styles.legendItem}>
         <span className={styles.dot} style={{ background: statusColors.answered }} aria-hidden="true" />Answered
       </div>
-      
       <div className={styles.legendItem}>
         <span className={styles.dot} style={{ background: statusColors.skipped }} aria-hidden="true" />Skipped
       </div>
@@ -43,5 +42,4 @@ const QuestionNumberSection = ({ questions, curIdx, statusMap, onSelect, notView
     </div>
   </aside>
 );
-
 export default QuestionNumberSection;
