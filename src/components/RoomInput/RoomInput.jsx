@@ -1,10 +1,16 @@
 import React from 'react';
 import styles from './RoomInput.module.css';
 
-const RoomInput = ({ roomCode, setRoomCode }) => {
+const RoomInput = ({ roomCode, setRoomCode, onJoinRoom }) => {
   const handleChange = (e) => {
     const value = e.target.value.toUpperCase();
     setRoomCode(value.replace(/[^A-Z0-9]/g, ''));
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      onJoinRoom();
+    }
   };
 
   return (
@@ -12,16 +18,16 @@ const RoomInput = ({ roomCode, setRoomCode }) => {
       <label htmlFor="room-code" className={styles.label}>
         Enter Room Code
       </label>
-      
       <div className={styles.inputContainer}>
         <input
           id="room-code"
           type="text"
           value={roomCode}
           onChange={handleChange}
+          onKeyDown={handleKeyDown}
           placeholder="Enter code here..."
           className={styles.input}
-          maxLength={6} 
+          maxLength={6}
           aria-describedby="room-code-help"
         />
         <div id="room-code-help" className={styles.srOnly}>

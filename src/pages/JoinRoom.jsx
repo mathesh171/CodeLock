@@ -16,7 +16,6 @@ const JoinRoomPage = () => {
 
   const handleJoinRoom = async () => {
     try {
-      // Use 'authUser' instead of 'userData' for localStorage
       const userData = JSON.parse(localStorage.getItem('authUser'));
       if (!userData) {
         toast.error('Please login first', {
@@ -45,9 +44,6 @@ const JoinRoomPage = () => {
         });
         return;
       }
-      // If backend expects lowercase, use: const roomcode = inputCode.trim().toLowerCase();
-      // If backend expects uppercase, use: const roomcode = inputCode.trim().toUpperCase();
-      // Otherwise, send as entered:
       const roomcode = inputCode.trim();
 
       const result = await joinRoom({ roomcode, username: userData.username });
