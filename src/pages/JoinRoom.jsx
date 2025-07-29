@@ -53,7 +53,7 @@ const JoinRoomPage = () => {
         setIsHost(false);
         navigate(`/lobby/${roomcode}`);
       } else {
-        toast.error('Failed to join room: ' + result, {
+        toast.error('Join room ' + result, {
           position: 'top-right',
           autoClose: 5000,
           hideProgressBar: false,
