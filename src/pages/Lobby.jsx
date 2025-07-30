@@ -102,7 +102,7 @@ const Lobby = ({ onBackToLanding, onStartGame }) => {
                 <li><span>6.</span> No refreshing or external help allowed — fair play is mandatory.</li>
               </ol>
 
-              {isHostuser && players.length>1? (
+              {isHostuser && players.length > 1 ? (
                 <div className={styles.buttonContainer}>
                   <button
                     onClick={handleStart}
@@ -116,7 +116,7 @@ const Lobby = ({ onBackToLanding, onStartGame }) => {
                 </div>
               ) : (
                 <div className={styles.waitingMessage}>
-                  Waiting for host to start the game...
+                  {isHostuser ? "Waiting for players to join" : "Waiting for host to start the game..."}
                 </div>
               )}
             </section>
