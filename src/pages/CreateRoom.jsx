@@ -5,36 +5,44 @@ import CreateRoomForm from '../components/CreateRoomForm/CreateRoomForm';
 import StarryBackground from '../components/StarryBackground/StarryBackground';
 import styles from '../components/CreateRoom/CreateRoom.module.css';
 import { createRoom } from '../services/room';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CreateRoom = () => {
   const navigate = useNavigate();
   const [roomSettings, setRoomSettings] = useState({});
   const [showCustomQuestions, setShowCustomQuestions] = useState(false);
   const [showCustomTimer, setShowCustomTimer] = useState(false);
-  const [message, setMessage] = useState("");
 
   const handleCreateRoom = async () => {
     try {
       const userData = JSON.parse(localStorage.getItem('authUser'));
       if (!userData) {
-        alert('Please login first');
+        toast.error('Please login first');
         navigate('/login');
         return;
       }
 
-      
       const roomData = {
-        difficulty: roomSettings.difficulty.toUpperCase(),
-        num_questions: showCustomQuestions && roomSettings.customQuestions 
-          ? parseInt(roomSettings.customQuestions) 
-          : roomSettings.questions,
-        timer: showCustomTimer && roomSettings.customTimer 
-          ? parseInt(roomSettings.customTimer) 
-          : roomSettings.timer === 'unlimited' ? 0 : roomSettings.timer,
-        username: userData.username
+        difficulty: roomSettings.difficulty?.toUpperCase(),
+        num_questions:
+          showCustomQuestions && roomSettings.customQuestions
+            ? parseInt(roomSettings.customQuestions)
+            : roomSettings.questions,
+        timer:
+          showCustomTimer && roomSettings.customTimer
+            ? parseInt(roomSettings.customTimer)
+            : roomSettings.timer === 'unlimited'
+            ? 0
+            : roomSettings.timer,
+        username: userData.username,
       };
 
-      setMessage("");
+      if (!roomData.difficulty || !roomData.num_questions || roomData.timer === undefined) {
+        toast.error('Incomplete form data');
+        return;
+      }
+
       const result = await createRoom(roomData);
       if (/^[a-zA-Z0-9]{6,}$/.test(result)) {
         navigate(`/lobby/${result}`, {
@@ -47,22 +55,23 @@ const CreateRoom = () => {
               players: [
                 {
                   name: userData.username,
-                  isHost: true
-                }
-              ]
-            }
-          }
+                  isHost: true,
+                },
+              ],
+            },
+          },
         });
       } else {
-        setMessage(result);
+        toast.error(result);
       }
     } catch (error) {
-      setMessage(error.message);
+      toast.error(error.message || 'Something went wrong');
     }
   };
 
   return (
     <div className={styles.container}>
+      <ToastContainer position="top-right" autoClose={3000} />
       <StarryBackground />
       <div className={styles.logo}>
         <Logo />
@@ -79,7 +88,6 @@ const CreateRoom = () => {
           onCustomQuestionsSubmit={() => setShowCustomQuestions(false)}
           onCustomTimerSubmit={() => setShowCustomTimer(false)}
         />
-        {message && <div style={{color: 'red', marginTop: '1rem'}}>{message}</div>}
       </main>
       <div className={styles.gradientOverlay} aria-hidden="true"></div>
     </div>
