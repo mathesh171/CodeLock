@@ -84,23 +84,29 @@
   cursor: pointer;
 }
 
-@media (max-width: 1200px) {
-  .mainLayoutNoScroll {
-    grid-template-columns: 80px 1fr 400px;
-  }
-  .editorBoxAuto { max-width:400px; }
+.responsiveBlock {
+  position: fixed;
+  inset: 0;
+  background: #f1f5fd;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 2000;
+  text-align: center;
 }
-@media (max-width: 900px) {
-  .mainLayoutNoScroll {
-    grid-template-columns: 50px 1fr;
-    grid-template-areas: "questionNumbers questionSection"
-                         "questionNumbers codeEditor";
-    grid-template-rows: minmax(220px,1fr) minmax(300px, 1fr);
+
+.responsiveMessage {
+  font-size: 1.2rem;
+  color: #333;
+}
+
+@media (max-width: 1000px) {
+  .responsiveBlock {
+    display: flex;
   }
-  .editorBoxAuto { 
-    grid-column: 2/3; 
-    grid-row: 2/3; 
-    min-width: unset; 
-    max-width: unset;
+  .mainLayoutNoScroll,
+  .modalOverlay {
+    display: none !important;
   }
 }

@@ -42,7 +42,7 @@ const TopBar = ({ username, roomCode, onSubmitTest }) => {
     axios.get(`http://localhost:8084/api/timer/${roomCode}`)
       .then((res) => {
         const data = res.data;
-        if (data === 'unlimited') {
+        if (data === 0) {
           setTotalTimeMinutes('unlimited');
           setTimeLeft(0);
         } else {

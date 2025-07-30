@@ -8,9 +8,10 @@ const Logo = () => {
   const location = useLocation();
 
   const isCodingPage = location.pathname.startsWith('/coding/');
+  const disablePointer = location.pathname === '/' || isCodingPage;
   
   const home = () => {
-    if (location.pathname !== '/') {
+    if (! disablePointer) {
       navigate('/');
     }
   }
@@ -18,7 +19,7 @@ const Logo = () => {
   
   return (
     <div 
-      className={`${styles.logoContainer} ${location.pathname === '/' ? styles.noPointer : ''}`} 
+      className={`${styles.logoContainer} ${disablePointer ? styles.noPointer : ''}`} 
       onClick={home}
     >
       <img src={logo} alt="Logo" className={styles.logoImage}/>

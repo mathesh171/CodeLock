@@ -7,6 +7,7 @@ import CodeEditorSection from '../components/CodeEditorSection/CodeEditorSection
 import { useRoom } from '../context/RoomContext';
 import { useAuthUser } from '../context/AuthUser';
 import styles from '../pageStyles/CodingArea.module.css';
+import Logo from '../components/Logo/Logo.jsx'
 
 const API_BASE = "http://localhost:8084";
 const LANG_OPTIONS = [
@@ -223,6 +224,13 @@ export default function CodingArea() {
           />
         </div>
       </main>
+      {window.innerWidth < 1200 && (
+        <div className={styles.responsiveBlock}>
+          
+          <Logo/>
+          <p className={styles.responsiveMessage}>Use a wider window to attend the test</p>
+        </div>
+      )}
     </div>
   );
 }
