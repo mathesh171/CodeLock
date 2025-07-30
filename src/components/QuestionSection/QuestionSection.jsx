@@ -37,18 +37,25 @@ const QuestionSection = ({ questionData }) => {
         <p>{description || "No problem statement provided."}</p>
       </article>
       {parsed.length > 0 && (
-        <>
+        <div className={styles.inputOutput}>
           <h3 className={styles.subHeading}>Sample Input</h3>
           {parsed.slice(0, 2).map((tc, idx) =>
-            <pre className={styles.codeBlock} key={'inp'+idx}>{tc.input}</pre>
+            <div key={'inp'+idx}>
+              <p className={styles.sampleLabel}>Input {idx + 1}</p>
+              <pre className={styles.codeBlock}>{tc.input}</pre>
+            </div>
           )}
           <h3 className={styles.subHeading}>Sample Output</h3>
           {parsed.slice(0, 2).map((tc, idx) =>
-            <pre className={styles.codeBlock} key={'out'+idx}>{tc.output}</pre>
+            <div key={'out'+idx}>
+              <p className={styles.sampleLabel}>Output {idx + 1}</p>
+              <pre className={styles.codeBlock}>{tc.output}</pre>
+            </div>
           )}
-        </>
+        </div>
       )}
     </section>
   );
 };
+
 export default QuestionSection;
