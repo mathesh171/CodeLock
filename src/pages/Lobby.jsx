@@ -116,7 +116,7 @@ const Lobby = ({ onBackToLanding, onStartGame }) => {
                 </div>
               ) : (
                 <div className={styles.waitingMessage}>
-                  {isHostuser ? "Waiting for players to join" : "Waiting for host to start the game..."}
+                  {isHostuser ? "Waiting for players to join..." : "Waiting for host to start the game..."}
                 </div>
               )}
             </section>

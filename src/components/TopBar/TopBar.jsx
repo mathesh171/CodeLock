@@ -6,7 +6,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const TopBar = ({ username, roomCode, onSubmitTest }) => {
-  const [timeLeft, setTimeLeft] = useState(0); // seconds
+  const [timeLeft, setTimeLeft] = useState(0); 
   const [timerActive, setTimerActive] = useState(false);
   const [totalTimeMinutes, setTotalTimeMinutes] = useState(null);
   const navigate = useNavigate();
@@ -26,65 +26,77 @@ const TopBar = ({ username, roomCode, onSubmitTest }) => {
     });
   };
 
- useEffect(() => {
-  if (!roomCode) return; 
+  useEffect(() => {
+    if (!roomCode) return;
 
-  const hasFetched = localStorage.getItem(`timerFetched-${roomCode}`);
-  const storedTime = localStorage.getItem(`timeLeft-${roomCode}`);
+    const hasFetched = localStorage.getItem(`timerFetched-${roomCode}`);
+    const storedTime = localStorage.getItem(`timeLeft-${roomCode}`);
 
-  if (hasFetched && storedTime) {
-    setTimeLeft(parseInt(storedTime));
-    setTimerActive(true);
-    setTotalTimeMinutes('restored');
-    return;
-  }
-
-  axios.get(`http://localhost:8084/api/timer/${roomCode}`)
-    .then((res) => {
-      const data = res.data;
-      if (data === 'unlimited') {
-        setTotalTimeMinutes('unlimited');
-        setTimeLeft(0);
-      } else {
-        setTotalTimeMinutes(data);
-        setTimeLeft(data * 60);
-      }
+    if (hasFetched && storedTime !== null) {
+      setTimeLeft(parseInt(storedTime));
       setTimerActive(true);
-      localStorage.setItem(`timerFetched-${roomCode}`, 'true');
-    })
-    .catch((e) => {
-      console.error("Timer fetch error:", e);
-    });
-}, [roomCode]);
+      setTotalTimeMinutes('restored');
+      return;
+    }
 
+    axios.get(`http://localhost:8084/api/timer/${roomCode}`)
+      .then((res) => {
+        const data = res.data;
+        if (data === 'unlimited') {
+          setTotalTimeMinutes('unlimited');
+          setTimeLeft(0);
+        } else {
+          setTotalTimeMinutes(data);
+          setTimeLeft(data * 60);
+        }
+        setTimerActive(true);
+        localStorage.setItem(`timerFetched-${roomCode}`, 'true');
+      })
+      .catch((e) => {
+        console.error("Timer fetch error:", e);
+      });
+  }, [roomCode]);
 
   useEffect(() => {
     if (!timerActive) return;
 
+    let interval;
+
     if (totalTimeMinutes === 'unlimited') {
-      const interval = setInterval(() => {
+      interval = setInterval(() => {
         setTimeLeft((t) => {
           const updated = t + 1;
+          if (updated >= 12000) {
+            clearInterval(interval);
+            setTimerActive(false);
+            handleFinalSubmit();
+            return 12000;
+          }
           localStorage.setItem(`timeLeft-${roomCode}`, updated);
           return updated;
         });
       }, 1000);
-      return () => clearInterval(interval);
-    }
+    } else {
+      if (timeLeft <= 0) {
+        setTimerActive(false);
+        handleFinalSubmit();
+        return;
+      }
 
-    if (timeLeft <= 0) {
-      setTimerActive(false);
-      handleFinalSubmit();
-      return;
+      interval = setInterval(() => {
+        setTimeLeft((t) => {
+          const updated = t - 1;
+          if (updated <= 0) {
+            clearInterval(interval);
+            setTimerActive(false);
+            handleFinalSubmit();
+            return 0;
+          }
+          localStorage.setItem(`timeLeft-${roomCode}`, updated);
+          return updated;
+        });
+      }, 1000);
     }
-
-    const interval = setInterval(() => {
-      setTimeLeft((t) => {
-        const updated = t - 1;
-        localStorage.setItem(`timeLeft-${roomCode}`, updated);
-        return updated;
-      });
-    }, 1000);
 
     return () => clearInterval(interval);
   }, [timeLeft, timerActive, totalTimeMinutes, roomCode]);
@@ -106,7 +118,9 @@ const TopBar = ({ username, roomCode, onSubmitTest }) => {
           <span className={styles.sep} aria-hidden="true">|</span>
           <span className={styles.label}>Room: <b>{roomCode}</b></span>
           <span className={styles.sep} aria-hidden="true">|</span>
-          <span className={styles.label}>Time Left: </span>
+          <span className={styles.label}>
+            {totalTimeMinutes === 'unlimited' ? 'Time' : 'Time Left'}: 
+          </span>
           <span className={styles.timer} aria-label={formatTime(timeLeft)}>
             {formatTime(timeLeft)}
           </span>
