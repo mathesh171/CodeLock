@@ -24,60 +24,82 @@
   scrollbar-gutter: stable;
 }
 
-
 .numberBtn {
   border: none;
   outline: none;
   background: transparent;
   color: #334155;
-  font-size: 1.08rem;
+  font-size: 1rem;
   display: flex;
   align-items: center;
-  gap: 0.7em;
+  gap: 0.5em;
   font-weight: 600;
-  border-radius: 0.7em;
-  padding: 0.3em 0.8em;
+  border-radius: 0.55em;
+  padding: 0.16em 0.39em;
   transition: background 0.17s;
   cursor: pointer;
-  width : 4rem;
+  width: 3rem;
+  height: 2.3rem;
 }
-.numberBtn.selected, .numberBtn:focus {
+
+.numberBtn.selected,
+.numberBtn:focus {
   background: #eff6ff;
   color: #2563eb;
   outline: none;
   box-shadow: 0 0 0 3px #60a5faaa;
 }
+
 .statusDot {
-  width: 12px; height: 12px;
-  border-radius: 100%;
+  width: 9px;
+  height: 9px;
+  min-width: 9px;
+  min-height: 9px;
+  border-radius: 50%;
   display: inline-block;
+  flex-shrink: 0;
+  margin-right: 0.2em;
 }
+
 .legend {
-  font-size: 0.93em;
+  font-size: 0.75rem;
   color: #626876;
   font-weight: 600;
   padding-top: 1rem;
   border-top: 1px solid #e2e8f0;
   width: 100%;
-  text-align: center;
 }
 
 .legendItem {
   display: flex;
-  align-items: center;
-  
-  margin-bottom: 0.4em;
+  align-items: left;
+  justify-content: space-between;
   font-weight: 600;
-}
-.dot {
-  width: 11px; height: 11px; border-radius: 1111px; display: inline-block; margin-right: 0.3em;
-}
-.count {
-  margin-left: 0.4em;
-  color: #2563eb;
-  font-weight: 700;
+  
 }
 
+.legendLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  min-width: 9px;
+  min-height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.count {
+  color: #2563eb;
+  font-weight: 700;
+  font-size: 0.75rem;
+  /* margin-left: ; */
+}
 
 @media (max-width: 900px) {
   .sidebar {
@@ -85,16 +107,3 @@
     padding: 1em 0.2em;
   }
 }
-
-.numberBtn {
-  font-size: 1rem;
-  width: 2.7rem;
-  height: 2.3rem;
-  border-radius: 0.55em;
-  padding: 0.16em 0.39em;
-}
-.statusDot {
-  width: 9px; height: 9px;
-  margin-right: 0.2em;
-}
-

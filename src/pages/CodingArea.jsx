@@ -45,6 +45,39 @@ export default function CodingArea() {
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [timer, setTimer] = useState(0);
   const authUser = getAuthUser();
+  const [statusMap, setStatusMap] = useState({});
+
+  const updateStatus = (idx, newStatus) => {
+    setStatusMap(prev => ({ ...prev, [idx]: newStatus }));
+  };
+
+  useEffect(() => {
+    if (questions.length > 0) {
+      setStatusMap(prev => {
+        const updated = { ...prev };
+        questions.forEach((_, idx) => {
+          if (updated[idx] === undefined) {
+            updated[idx] = 'unseen';
+          }
+        });
+        return updated;
+      });
+    }
+  }, [questions]);
+
+
+  useEffect(() => {
+    const savedStatus = localStorage.getItem(`statusMap-${roomCode}`);
+    if (savedStatus) {
+      setStatusMap(JSON.parse(savedStatus));
+    }
+  }, [roomCode]);
+
+  useEffect(() => {
+    localStorage.setItem(`statusMap-${roomCode}`, JSON.stringify(statusMap));
+  }, [statusMap, roomCode]);
+
+
 
   useEffect(() => {
     if (roomCodeParam && roomCodeParam !== roomCode) setRoomCode(roomCodeParam);
@@ -81,15 +114,27 @@ export default function CodingArea() {
     }
   }, [curIdx, questions, langByQ, lang]);
 
+  const markCurrentAsSkippedIfUnanswered = () => {
+    if (statusMap[curIdx] === 'unseen') {
+      updateStatus(curIdx, 'skipped');
+    }
+  };
+
   const handlePrev = () => {
+    markCurrentAsSkippedIfUnanswered();
     if (curIdx > 0) setCurIdx(curIdx - 1);
   };
+
   const handleNext = () => {
+    markCurrentAsSkippedIfUnanswered();
     if (curIdx < questions.length - 1) setCurIdx(curIdx + 1);
   };
+
   const handleSelectQuestion = (idx) => {
+    markCurrentAsSkippedIfUnanswered();
     setCurIdx(idx);
-  };
+};
+
   const handleRun = async () => {
     setLoading(true);
     setRunResult(null);
@@ -127,9 +172,7 @@ export default function CodingArea() {
     try {
       const res = await fetch(`${API_BASE}/api/submit`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: currentQ.id,
           code,
@@ -141,12 +184,14 @@ export default function CodingArea() {
       });
       const data = await res.json();
       setSubmitResult(data);
+      updateStatus(curIdx, 'answered');
     } catch (err) {
       setSubmitResult({ error: "Submit error" });
     }
     setLoading(false);
   };
   const handleFinalSubmit = () => {
+    localStorage.removeItem(`statusMap-${roomCode}`);
     fetch(`${API_BASE}/api/submittest`, {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
@@ -195,10 +240,9 @@ export default function CodingArea() {
           <QuestionNumberSection
             questions={questions}
             curIdx={curIdx}
-            statusMap={{}}
+            statusMap={statusMap}
             onSelect={handleSelectQuestion}
             notViewedCount={questions.length}
-            savedInServerCount={0}
           />
         </div>
         <div className={styles.questionSectionAuto}>
