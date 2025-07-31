@@ -13,10 +13,11 @@
   position: relative;
 }
 .row {
-  display: flex; 
-  align-items: center; 
-  margin-bottom: 0.7em; 
-  gap: 1em;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 0.7em;
+  gap: 0.75em;
 }
 .label {
   font-weight: 600;
@@ -37,6 +38,18 @@
   margin-bottom: 1.1rem;
   overflow: hidden;
 }
+
+.monacoScrollWrapper {
+  height: 320px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.cellText {
+  color: black;
+}
+
+
 .btnRow {
   display: flex;
   justify-content: space-between;
@@ -113,7 +126,6 @@
   max-width: 100%;
 }
 
-/* Prevent horizontal scroll in editor content, wrap if needed */
 .editorOuter {
   border-radius: 10px;
   box-shadow: 0 2px 12px rgba(30, 58, 138, 0.10);
@@ -126,7 +138,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* Wrap buttons if viewport is narrow */
   gap: 0.7em;
   flex-wrap: wrap;
   position: absolute;
@@ -143,6 +154,10 @@
   flex: 1 1 0;
   min-width: 115px;
   max-width: 200px;
+}
+
+.textBlue{
+  color: #2563eb;
 }
 
 @media (max-width: 800px) {
@@ -164,7 +179,6 @@
   font-size: 0.97rem;
   margin-top: 1rem;
   margin-bottom: 0.7rem;
-  /* Remove scroll from table itself; move to outer box */
   max-height: unset;
   overflow: unset;
 }
@@ -198,7 +212,36 @@
   text-align: center;
 }
 
-@media (max-width: 1000px) {
-  .editorBox { max-width: 98vw; min-width: unset; margin: 1rem 0; }
-  .btnRow { position: static; left: unset; right: unset; bottom: unset; }
+.btnRunGroup {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 0.75em;
+  margin-bottom: 1.2rem;
+  width: 100%;
+  box-sizing: border-box;
 }
+
+.btnRunGroup > button {
+  flex: 1;
+  min-width: 100px;
+  max-width: 160px;
+  box-sizing: border-box;
+}
+
+
+.btnRowBottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1em;
+  padding-top: 1rem;
+  position: relative;
+  background: #f1f5fd;
+}
+
+.editorBox {
+  overflow-y: auto;
+}
+

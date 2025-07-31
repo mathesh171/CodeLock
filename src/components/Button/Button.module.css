@@ -85,10 +85,6 @@
 }
 
 
-.textBlue {
-  color: #2563eb ;
-  background-color: #2563eb;
-}
 
 @media (max-width: 600px) {
   .button, .small, .medium, .large {

@@ -52,145 +52,99 @@ const CodeEditorSection = ({
         </select>
       </div>
       <div className={styles.editorOuter}>
-        <MonacoEditor
-          language={
-            lang === "python3" ? "python" :
-            lang === "cpp" ? "cpp" :
-            lang === "java" ? "java" : "c"
-          }
-          theme="leetcode-dark"
-          value={code}
-          onChange={setCode}
-          options={{
-            fontSize: 15,
-            minimap: { enabled: false },
-            scrollBeyondLastLine: false,
-            automaticLayout: true,
-            scrollbar: { horizontal: 'hidden', vertical: 'auto' },
-          }}
-          height="320px"
-          editorWillMount={(monaco) => {
-            monaco.languages.registerCompletionItemProvider(lang, {
-              provideCompletionItems: () => ({
-                suggestions: [
-                  {
-                    label: 'Scanner',
-                    kind: monaco.languages.CompletionItemKind.Class,
-                    insertText: 'Scanner',
-                    documentation: 'Java Scanner class',
-                  },
+          <div className={styles.monacoScrollWrapper}>
+          <MonacoEditor
+            language={
+              lang === "python3" ? "python" :
+              lang === "cpp" ? "cpp" :
+              lang === "java" ? "java" : "c"
+            }
+            theme="leetcode-dark"
+            value={code}
+            onChange={setCode}
+            options={{
+              fontSize: 15,
+              minimap: { enabled: false },
+              scrollBeyondLastLine: false,
+              automaticLayout: true,
+              scrollbar: { horizontal: 'hidden', vertical: 'auto' },
+            }}
+            height="320px"
+            editorWillMount={(monaco) => {
+              monaco.languages.registerCompletionItemProvider(lang, {
+                provideCompletionItems: () => ({
+                  suggestions: [
+                    {
+                      label: 'Scanner',
+                      kind: monaco.languages.CompletionItemKind.Class,
+                      insertText: 'Scanner',
+                      documentation: 'Java Scanner class',
+                    },
+                  ],
+                }),
+                triggerCharacters: ['S'],
+              });
+              monaco.editor.defineTheme('leetcode-dark', {
+                base: 'vs-dark',
+                inherit: true,
+                rules: [
+                  { token: 'comment', foreground: '6A9955' },
+                  { token: 'keyword', foreground: '569CD6' },
+                  { token: 'number', foreground: 'B5CEA8' },
+                  { token: 'string', foreground: 'CE9178' },
+                  { token: 'operator', foreground: 'D4D4D4' },
+                  { token: 'namespace', foreground: '4EC9B0' },
+                  { token: 'type.identifier', foreground: '4EC9B0' },
+                  { token: 'function', foreground: 'DCDCAA' },
+                  { token: 'variable', foreground: '9CDCFE' },
+                  { token: 'class', foreground: '4EC9B0' }
                 ],
-              }),
-              triggerCharacters: ['S'],
-            });
-            monaco.editor.defineTheme('leetcode-dark', {
-              base: 'vs-dark',
-              inherit: true,
-              rules: [
-                { token: 'comment', foreground: '6A9955' },
-                { token: 'keyword', foreground: '569CD6' },
-                { token: 'number', foreground: 'B5CEA8' },
-                { token: 'string', foreground: 'CE9178' },
-                { token: 'operator', foreground: 'D4D4D4' },
-                { token: 'namespace', foreground: '4EC9B0' },
-                { token: 'type.identifier', foreground: '4EC9B0' },
-                { token: 'function', foreground: 'DCDCAA' },
-                { token: 'variable', foreground: '9CDCFE' },
-                { token: 'class', foreground: '4EC9B0' }
-              ],
-              colors: {
-                'editor.background': '#1e1e1e',
-                'editor.foreground': '#d4d4d4',
-                'editorLineNumber.foreground': '#858585',
-                'editorCursor.foreground': '#AEAFAD',
-                'editor.lineHighlightBackground': '#2a2d2e'
-              }
-            });
-          }}
-          editorDidMount={(editor, monaco) => {
-            monaco.editor.setTheme('leetcode-dark');
-          }}
-        />
+                colors: {
+                  'editor.background': '#1e1e1e',
+                  'editor.foreground': '#d4d4d4',
+                  'editorLineNumber.foreground': '#858585',
+                  'editorCursor.foreground': '#AEAFAD',
+                  'editor.lineHighlightBackground': '#2a2d2e'
+                }
+              });
+            }}
+            editorDidMount={(editor, monaco) => {
+              monaco.editor.setTheme('leetcode-dark');
+            }}
+          />
+        </div>
+      </div>
+      <div className={styles.btnRunGroup}>
+        <Button variant="ternary" size="small" className={styles.textBlue} onClick={onClear} ariaLabel="Clear code editor">Clear</Button>
+        <Button variant="secondary" size="small" className={styles.textBlue} onClick={onRun} disabled={loading} ariaLabel="Compile and run code">Compile & Run</Button>
+        <Button variant="primary" size="small" onClick={onSubmit} disabled={loading} ariaLabel="Submit code">Submit Code</Button>
       </div>
       <div className={styles.resultBox} aria-live="polite" aria-atomic="true">
         <TestCasesResultTable runResult={runResult} submitResult={submitResult} />
       </div>
     </div>
-    <div className={styles.btnRow}>
-      <Button
-        variant="secondary"
-        className={styles.textBlue}
-        onClick={onPrev}
-        disabled={isPrevDisabled}
-        ariaLabel="Previous question"
-      >
-        Prev
-      </Button>
-      <Button
-        variant="ternary"
-        className={styles.textBlue}
-        onClick={onClear}
-        ariaLabel="Clear code editor"
-      >
-        Clear
-      </Button>
-      <Button
-        variant="secondary"
-        className={styles.textBlue}
-        onClick={onRun}
-        disabled={loading}
-        ariaLabel="Compile and run code"
-      >
-        Compile & Run
-      </Button>
-      <Button
-        variant="primary"
-        onClick={onSubmit}
-        disabled={loading}
-        ariaLabel="Submit code"
-      >
-        Submit Code
-      </Button>
-      <Button
-        variant="secondary"
-        className={styles.textBlue}
-        onClick={onNext}
-        disabled={isNextDisabled}
-        ariaLabel="Next question"
-      >
-        Next
-      </Button>
+    <div className={styles.btnRowBottom}>
+      <Button variant="ternary" size="small" className={styles.textBlue} onClick={onPrev} disabled={isPrevDisabled} ariaLabel="Previous question">Prev</Button>
+      <Button variant="ternary" size="small" className={styles.textBlue} onClick={onNext} disabled={isNextDisabled} ariaLabel="Next question">Next</Button>
     </div>
   </aside>
 );
 
 const TestCasesResultTable = ({ runResult, submitResult }) => {
   const getRows = () => {
-    if (runResult) {
-      const res = [];
-      for (let i = 1; i <= 2; i++) {
-        res.push({
-          id: i,
-          status: runResult[`testcase${i}status`] || '',
-          output: runResult[`testcase${i}op`] || '',
-          error: runResult[`testcase${i}error`] || '',
-        });
-      }
-      return res;
+    const result = runResult || submitResult;
+    if (!result) return [];
+
+    const rows = [];
+    for (let i = 1; i <= 2; i++) {
+      rows.push({
+        id: i,
+        expected: result[`testcase${i}expected`] || '',
+        output: result[`testcase${i}op`] || '',
+        status: result[`testcase${i}status`] || ''
+      });
     }
-    if (submitResult) {
-      const res = [];
-      for (let i = 1; i <= 2; i++) {
-        res.push({
-          id: i,
-          status: submitResult[`testcase${i}status`] || '',
-          output: submitResult[`testcase${i}op`] || '',
-          error: submitResult[`testcase${i}error`] || '',
-        });
-      }
-      return res;
-    }
-    return [];
+    return rows;
   };
 
   const rows = getRows();
@@ -204,20 +158,18 @@ const TestCasesResultTable = ({ runResult, submitResult }) => {
       <thead>
         <tr>
           <th>Testcase</th>
+          <th>Expected Output</th>
+          <th>Your Output</th>
           <th>Status</th>
-          <th>Output</th>
-          <th>Error</th>
         </tr>
       </thead>
       <tbody>
         {rows.map(r => (
           <tr key={r.id}>
-            <td>{r.id}</td>
-            <td className={r.status === 'success' ? styles.passed : styles.failed}>
-              {r.status}
-            </td>
-            <td>{r.output}</td>
-            <td style={{ color: r.error ? 'red' : undefined }}>{r.error}</td>
+            <td className={styles.cellText}>{r.id}</td>
+            <td className={styles.cellText}>{r.expected}</td>
+            <td className={styles.cellText}>{r.output}</td>
+            <td className={r.status === 'success' ? styles.passed : styles.failed}>{r.status}</td>
           </tr>
         ))}
       </tbody>
