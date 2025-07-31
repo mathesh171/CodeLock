@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import TopBar from '../components/TopBar/TopBar';
 import QuestionNumberSection from '../components/QuestionNumberSection/QuestionNumberSection';
@@ -7,7 +7,7 @@ import CodeEditorSection from '../components/CodeEditorSection/CodeEditorSection
 import { useRoom } from '../context/RoomContext';
 import { useAuthUser } from '../context/AuthUser';
 import styles from '../pageStyles/CodingArea.module.css';
-import Logo from '../components/Logo/Logo.jsx'
+import Logo from '../components/Logo/Logo.jsx';
 
 const API_BASE = "http://localhost:8084";
 const LANG_OPTIONS = [
@@ -29,6 +29,7 @@ function getAuthUser() {
     return {};
   }
 }
+
 export default function CodingArea() {
   const { roomCode: roomCodeParam } = useParams();
   const { roomCode, setRoomCode } = useRoom();
@@ -38,7 +39,7 @@ export default function CodingArea() {
   const [curIdx, setCurIdx] = useState(0);
   const [codeByQ, setCodeByQ] = useState({});
   const [langByQ, setLangByQ] = useState({});
-  const [lang, setLang] = useState('python3');
+  const [lang, setLang] = useState('java');
   const [runResult, setRunResult] = useState(null);
   const [submitResult, setSubmitResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -46,6 +47,18 @@ export default function CodingArea() {
   const [timer, setTimer] = useState(0);
   const authUser = getAuthUser();
   const [statusMap, setStatusMap] = useState({});
+
+  useEffect(() => {
+    const savedLang = localStorage.getItem(`lang-${roomCode}`);
+    const savedCurIdx = localStorage.getItem(`curIdx-${roomCode}`);
+    const savedCodes = localStorage.getItem(`codeByQ-${roomCode}`);
+    const savedLangs = localStorage.getItem(`langByQ-${roomCode}`);
+
+    if (savedLang) setLang(savedLang);
+    if (savedCurIdx) setCurIdx(Number(savedCurIdx));
+    if (savedCodes) setCodeByQ(JSON.parse(savedCodes));
+    if (savedLangs) setLangByQ(JSON.parse(savedLangs));
+  }, [roomCode]);
 
   const updateStatus = (idx, newStatus) => {
     setStatusMap(prev => ({ ...prev, [idx]: newStatus }));
@@ -65,7 +78,6 @@ export default function CodingArea() {
     }
   }, [questions]);
 
-
   useEffect(() => {
     const savedStatus = localStorage.getItem(`statusMap-${roomCode}`);
     if (savedStatus) {
@@ -76,8 +88,6 @@ export default function CodingArea() {
   useEffect(() => {
     localStorage.setItem(`statusMap-${roomCode}`, JSON.stringify(statusMap));
   }, [statusMap, roomCode]);
-
-
 
   useEffect(() => {
     if (roomCodeParam && roomCodeParam !== roomCode) setRoomCode(roomCodeParam);
@@ -93,26 +103,43 @@ export default function CodingArea() {
           if (data.length > 0) {
             const codes = {};
             const langs = {};
-            data.forEach((q, idx) => {
-              const defLang = lang;
-              codes[q.questions_id.id] = initialCodeSamples[defLang];
-              langs[q.questions_id.id] = defLang;
+            data.forEach((q) => {
+              const qid = q.questions_id.id;
+              const storedLang = langByQ[qid] || lang;
+              langs[qid] = storedLang;
+              codes[qid] = codeByQ[qid] || initialCodeSamples[storedLang];
             });
             setCodeByQ(codes);
             setLangByQ(langs);
-            setCurIdx(0);
           }
         }
       });
     return () => { isMounted = false; };
-  }, [roomCode, lang]);
+  }, [roomCode]);
 
   useEffect(() => {
     if (questions.length > 0) {
       const current = questions[curIdx]?.questions_id;
-      setLang(langByQ[current?.id] || lang);
+      const langFromMap = langByQ[current?.id];
+      if (langFromMap) setLang(langFromMap);
     }
-  }, [curIdx, questions, langByQ, lang]);
+  }, [curIdx, questions, langByQ]);
+
+  useEffect(() => {
+    localStorage.setItem(`lang-${roomCode}`, lang);
+  }, [lang, roomCode]);
+
+  useEffect(() => {
+    localStorage.setItem(`curIdx-${roomCode}`, curIdx);
+  }, [curIdx, roomCode]);
+
+  useEffect(() => {
+    localStorage.setItem(`codeByQ-${roomCode}`, JSON.stringify(codeByQ));
+  }, [codeByQ, roomCode]);
+
+  useEffect(() => {
+    localStorage.setItem(`langByQ-${roomCode}`, JSON.stringify(langByQ));
+  }, [langByQ, roomCode]);
 
   const markCurrentAsSkippedIfUnanswered = () => {
     if (statusMap[curIdx] === 'unseen') {
@@ -133,7 +160,7 @@ export default function CodingArea() {
   const handleSelectQuestion = (idx) => {
     markCurrentAsSkippedIfUnanswered();
     setCurIdx(idx);
-};
+  };
 
   const handleRun = async () => {
     setLoading(true);
@@ -145,23 +172,17 @@ export default function CodingArea() {
     try {
       const res = await fetch(`${API_BASE}/api/run`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          id: currentQ.id,
-          code,
-          lang,
-          ext
-        })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: currentQ.id, code, lang, ext })
       });
       const data = await res.json();
       setRunResult(data);
-    } catch (err) {
+    } catch {
       setRunResult({ error: "Run error" });
     }
     setLoading(false);
   };
+
   const handleSubmitCode = async () => {
     setLoading(true);
     setRunResult(null);
@@ -185,11 +206,12 @@ export default function CodingArea() {
       const data = await res.json();
       setSubmitResult(data);
       updateStatus(curIdx, 'answered');
-    } catch (err) {
+    } catch {
       setSubmitResult({ error: "Submit error" });
     }
     setLoading(false);
   };
+
   const handleFinalSubmit = () => {
     localStorage.removeItem(`statusMap-${roomCode}`);
     fetch(`${API_BASE}/api/submittest`, {
@@ -201,25 +223,38 @@ export default function CodingArea() {
       navigate(`/result/${roomCode}`);
     });
   };
+
   const handleCancelSubmit = () => setShowSubmitModal(false);
+
   const handleClear = () => {
     const current = questions[curIdx]?.questions_id;
     setCodeByQ(prev => ({ ...prev, [current.id]: initialCodeSamples[lang] }));
   };
+
   const handleLangChange = (val) => {
     const current = questions[curIdx]?.questions_id;
     setLang(val);
-    setCodeByQ(prev => ({ ...prev, [current.id]: initialCodeSamples[val] }));
+    setCodeByQ(prev => ({
+      ...prev,
+      [current.id]: prev[current.id] || initialCodeSamples[val]
+    }));
     setLangByQ(prev => ({ ...prev, [current.id]: val }));
   };
+
   const handleCodeChange = (val) => {
     const current = questions[curIdx]?.questions_id;
     setCodeByQ(prev => ({ ...prev, [current.id]: val }));
   };
+
   const displayCode = (() => {
     const current = questions[curIdx]?.questions_id;
     return (codeByQ && current && codeByQ[current.id]) || initialCodeSamples[lang];
   })();
+  const currentExpectedOutputs = (() => {
+    const currentQ = questions[curIdx]?.questions_id;
+    return currentQ?.expected_outputs || []; 
+  })();
+
   return (
     <div className={styles.fixedViewport}>
       <TopBar username={user?.username || authUser?.username || 'Guest'} roomCode={roomCode} onSubmitTest={() => setShowSubmitModal(true)} />
@@ -265,13 +300,13 @@ export default function CodingArea() {
             isPrevDisabled={curIdx === 0}
             isNextDisabled={curIdx === questions.length - 1}
             totalQuestions={questions.length}
+            expectedOutputs={currentExpectedOutputs}
           />
         </div>
       </main>
       {window.innerWidth < 1200 && (
         <div className={styles.responsiveBlock}>
-          
-          <Logo/>
+          <Logo />
           <p className={styles.responsiveMessage}>Use a wider window to attend the test</p>
         </div>
       )}
