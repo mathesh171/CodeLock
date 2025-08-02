@@ -12,8 +12,7 @@
 .mainLayoutNoScroll {
   flex: 1 1 0;
   display: grid;
-  grid-template-columns: 100px 1fr 540px;
-  grid-template-rows: 1fr;
+  grid-template-columns: 100px 540px 1fr;
   grid-template-areas: "questionNumbers questionSection codeEditor";
   overflow: hidden;
   height: 100%;
@@ -37,7 +36,6 @@
   grid-area: codeEditor;
   width: 100%;
   min-width: 300px;
-  max-width: 540px;
   overflow: auto;
   display: flex;
   flex-direction: column;

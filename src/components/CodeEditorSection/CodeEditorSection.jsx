@@ -1,20 +1,20 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./CodeEditorSection.module.css";
 import Button from "../Button/Button";
 import MonacoEditor from "react-monaco-editor";
 
 const LANG_OPTIONS = [
-  { value: 'java', label: 'Java', ext: 'java' },
-  { value: 'python3', label: 'Python 3', ext: 'py' },
-  { value: 'cpp', label: 'C++', ext: 'cpp' },
-  { value: 'c', label: 'C', ext: 'c' }
+  { value: "java", label: "Java", ext: "java" },
+  { value: "python3", label: "Python 3", ext: "py" },
+  { value: "cpp", label: "C++", ext: "cpp" },
+  { value: "c", label: "C", ext: "c" },
 ];
 
 const defaultCodeByLang = {
-  python3: '# Write your Python code here\ndef solution():\n    pass',
-  java: '// Write your Java code here\npublic class Solution {\n    public static void main(String[] args) {\n    }\n}',
-  cpp: '// Write your C++ code here\nint main() {\n    return 0;\n}',
-  c: '// Write your C code here\n#include <stdio.h>\nint main() {\n    printf("Hello, World!");\n    return 0;\n}'
+  python3: "# Write your Python code here\ndef solution():\n    pass",
+  java: "// Write your Java code here\npublic class Solution {\n    public static void main(String[] args) {\n    }\n}",
+  cpp: "// Write your C++ code here\nint main() {\n    return 0;\n}",
+  c: '// Write your C code here\n#include <stdio.h>\nint main() {\n    printf("Hello, World!");\n    return 0;\n}',
 };
 
 const CodeEditorSection = ({
@@ -36,82 +36,178 @@ const CodeEditorSection = ({
   totalQuestions,
   setLangByQ,
   setCodeByQ,
-  currentQuestionId
+  currentQuestionId,
 }) => {
+  const [editorHeight, setEditorHeight] = useState(500);
+
   useEffect(() => {
     if (!code && defaultCodeByLang[lang]) {
       setCode(defaultCodeByLang[lang]);
     }
   }, [lang, code, setCode]);
 
+  useEffect(() => {
+    const updateHeight = () => {
+      const lineHeight = 22;
+      const visibleLines = 13;
+      setEditorHeight(visibleLines * lineHeight);
+    };
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+    return () => window.removeEventListener("resize", updateHeight);
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey && !e.shiftKey && !e.altKey) {
+        if (e.key === ";") {
+          e.preventDefault();
+          if (!loading && onRun) {
+            onRun();
+          }
+        } else if (e.key === "'") {
+          e.preventDefault();
+          if (!loading && onSubmit) {
+            onSubmit();
+          }
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [loading, onRun, onSubmit]);
+
+  const handleEditorWillMount = (monaco) => {
+    monaco.languages.registerCompletionItemProvider("java", {
+      provideCompletionItems: () => ({
+        suggestions: [
+          {
+            label: "System.out.println",
+            kind: monaco.languages.CompletionItemKind.Function,
+            insertText: "System.out.println($1);",
+            insertTextRules:
+              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            documentation: "Prints output to console",
+          },
+          {
+            label: "main",
+            kind: monaco.languages.CompletionItemKind.Snippet,
+            insertText: [
+              "public static void main(String[] args) {",
+              "\t$0",
+              "}",
+            ].join("\n"),
+            insertTextRules:
+              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            documentation: "Main method snippet",
+          },
+        ],
+      }),
+    });
+
+    monaco.editor.defineTheme("leetcode-dark", {
+      base: "vs-dark",
+      inherit: true,
+      rules: [
+        { token: "keyword", foreground: "C586C0" },
+        { token: "comment", foreground: "6A9955", fontStyle: "italic" },
+        { token: "string", foreground: "CE9178" },
+        { token: "number", foreground: "B5CEA8" },
+        { token: "type", foreground: "4EC9B0" },
+        { token: "identifier", foreground: "D4D4D4" },
+      ],
+      colors: {
+        "editor.background": "#1e1e1e",
+        "editorLineNumber.foreground": "#858585",
+        "editorLineNumber.activeForeground": "#c6c6c6",
+        "editorCursor.foreground": "#FFFFFF",
+      },
+    });
+  };
+
   const handleLangChange = (newLang) => {
     setLang(newLang);
     if (setLangByQ && currentQuestionId) {
-      setLangByQ(prev => ({ ...prev, [currentQuestionId]: newLang }));
+      setLangByQ((prev) => ({ ...prev, [currentQuestionId]: newLang }));
     }
     if (setCodeByQ && currentQuestionId) {
-      setCodeByQ(prev => ({
+      setCodeByQ((prev) => ({
         ...prev,
-        [currentQuestionId]: prev[currentQuestionId] || defaultCodeByLang[newLang]
+        [currentQuestionId]: prev[currentQuestionId] || defaultCodeByLang[newLang],
       }));
     }
     setCode(defaultCodeByLang[newLang]);
   };
+  const onCodeChange = (newCode) => {
+    const qid = currentQuestionId;
+    setCodeByQ(prev => ({ ...prev, [qid]: newCode }));
+    setCode(newCode);
+  };
 
   return (
     <aside className={styles.editorBox}>
+      <div className={styles.row}>
+        <label htmlFor="lang" className={styles.label}>
+          Language:
+        </label>
+        <select
+          id="lang"
+          className={styles.dropdown}
+          value={lang}
+          onChange={(e) => handleLangChange(e.target.value)}
+          aria-required="true"
+        >
+          {LANG_OPTIONS.map((l) => (
+            <option key={l.value} value={l.value}>
+              {l.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div className={styles.editorInnerScroll}>
-        <div className={styles.row}>
-          <label htmlFor="lang" className={styles.label}>Language:</label>
-          <select
-            id="lang"
-            className={styles.dropdown}
-            value={lang}
-            onChange={e => handleLangChange(e.target.value)}
-            aria-required="true"
-          >
-            {LANG_OPTIONS.map(l => (
-              <option key={l.value} value={l.value}>{l.label}</option>
-            ))}
-          </select>
-        </div>
-        <div className={styles.editorOuter}>
+        <div
+          className={styles.editorOuterFixedHeight}
+          style={{ height: editorHeight }}
+        >
           <MonacoEditor
             language={
-              lang === "python3" ? "python" :
-              lang === "cpp" ? "cpp" :
-              lang === "java" ? "java" : "c"
+              lang === "python3"
+                ? "python"
+                : lang === "cpp"
+                ? "cpp"
+                : lang === "java"
+                ? "java"
+                : "c"
             }
             theme="leetcode-dark"
             value={code}
             onChange={setCode}
             options={{
               fontSize: 15,
+              lineHeight: 22,
               minimap: { enabled: false },
               scrollBeyondLastLine: false,
               automaticLayout: true,
+              bracketPairColorization: { enabled: true },
+              autoClosingBrackets: "always",
+              autoIndent: "full",
+              formatOnType: true,
+              matchBrackets: "always",
+              folding: true,
               scrollbar: {
-                vertical: 'visible',
-                horizontal: 'auto'
-              }
+                vertical: "auto",
+                horizontal: "auto",
+              },
+              hover: { enabled: true },
+              parameterHints: { enabled: true },
             }}
-            height="500px"
+            height={`${editorHeight}px`}
             width="100%"
-            editorWillMount={(monaco) => {
-              monaco.editor.defineTheme('leetcode-dark', {
-                base: 'vs-dark',
-                inherit: true,
-                rules: [],
-                colors: {
-                  'editor.background': '#1e1e1e',
-                  'editorLineNumber.foreground': '#858585',
-                  'editorLineNumber.activeForeground': '#c6c6c6'
-                }
-              });
-            }}
+            editorWillMount={handleEditorWillMount}
             editorDidMount={(editor, monaco) => {
-              monaco.editor.setTheme('leetcode-dark');
-              const style = document.createElement('style');
+              monaco.editor.setTheme("leetcode-dark");
+              const style = document.createElement("style");
               style.innerHTML = `
                 .monaco-editor .scrollbar,
                 .monaco-scrollable-element {
@@ -135,19 +231,73 @@ const CodeEditorSection = ({
             }}
           />
         </div>
+
         <div className={styles.btnRunGroup}>
-          <Button variant="ternary" size="small" className={styles.textBlue} onClick={onClear} ariaLabel="Clear code editor">Clear</Button>
-          <Button variant="secondary" size="small" className={styles.textBlue} onClick={onRun} disabled={loading} ariaLabel="Compile and run code">Compile & Run</Button>
-          <Button variant="primary" size="small" onClick={onSubmit} disabled={loading} ariaLabel="Submit code">Submit Code</Button>
+          <Button
+            variant="ternary"
+            size="small"
+            className={styles.textBlue}
+            onClick={onClear}
+            ariaLabel="Clear code editor"
+          >
+            Clear
+          </Button>
+          <Button
+            variant="secondary"
+            size="small"
+            className={styles.textBlue}
+            onClick={onRun}
+            disabled={loading}
+            ariaLabel="Compile and run code"
+          >
+            Compile & Run
+          </Button>
+          <Button
+            variant="primary"
+            size="small"
+            onClick={onSubmit}
+            disabled={loading}
+            ariaLabel="Submit code"
+          >
+            Submit Code
+          </Button>
         </div>
-        <div className={styles.resultBox} aria-live="polite" aria-atomic="true">
-          <UICodeRunResultTable runResult={runResult} expectedOutputs={expectedOutputs} />
+
+        <div
+          className={styles.resultBox}
+          aria-live="polite"
+          aria-atomic="true"
+          style={{ flexShrink: 0 }}
+        >
+          <UICodeRunResultTable
+            runResult={runResult}
+            expectedOutputs={expectedOutputs}
+          />
           <UICodeSubmitResultTable submitResult={submitResult} />
         </div>
       </div>
+
       <div className={styles.btnRowBottom}>
-        <Button variant="ternary" size="small" className={styles.textBlue} onClick={onPrev} disabled={isPrevDisabled} ariaLabel="Previous question">Prev</Button>
-        <Button variant="ternary" size="small" className={styles.textBlue} onClick={onNext} disabled={isNextDisabled} ariaLabel="Next question">Next</Button>
+        <Button
+          variant="ternary"
+          size="small"
+          className={styles.textBlue}
+          onClick={onPrev}
+          disabled={isPrevDisabled}
+          ariaLabel="Previous question"
+        >
+          Prev
+        </Button>
+        <Button
+          variant="ternary"
+          size="small"
+          className={styles.textBlue}
+          onClick={onNext}
+          disabled={isNextDisabled}
+          ariaLabel="Next question"
+        >
+          Next
+        </Button>
       </div>
     </aside>
   );
@@ -156,12 +306,17 @@ const CodeEditorSection = ({
 function UICodeRunResultTable({ runResult, expectedOutputs = [] }) {
   if (!runResult || typeof runResult !== "object") return null;
 
-  const testcases = expectedOutputs.length > 0 ?
-    expectedOutputs.map((_, i) => i + 1) : [1, 2];
+  const testcases =
+    expectedOutputs.length > 0
+      ? expectedOutputs.map((_, i) => i + 1)
+      : [1, 2];
 
-  const rows = testcases.map(i => {
+  const rows = testcases.map((i) => {
     let expected = expectedOutputs[i - 1] || "";
-    const yourOutput = typeof runResult[`testcase${i}op`] === "string" ? runResult[`testcase${i}op`] : "";
+    const yourOutput =
+      typeof runResult[`testcase${i}op`] === "string"
+        ? runResult[`testcase${i}op`]
+        : "";
     const error = runResult[`testcase${i}error`];
     let statusText, statusClass;
     if (error && error.trim()) {
@@ -179,7 +334,7 @@ function UICodeRunResultTable({ runResult, expectedOutputs = [] }) {
       expected,
       yourOutput,
       statusText,
-      statusClass
+      statusClass,
     };
   });
 
@@ -194,7 +349,7 @@ function UICodeRunResultTable({ runResult, expectedOutputs = [] }) {
         </tr>
       </thead>
       <tbody>
-        {rows.map(row => (
+        {rows.map((row) => (
           <tr key={row.testcase}>
             <td className={styles.cellText}>{row.testcase}</td>
             <td className={styles.cellText}>{row.expected}</td>
@@ -210,8 +365,8 @@ function UICodeRunResultTable({ runResult, expectedOutputs = [] }) {
 function UICodeSubmitResultTable({ submitResult }) {
   if (!submitResult || typeof submitResult !== "object") return null;
   const tcNums = Object.keys(submitResult)
-    .filter(k => k.startsWith("testcase") && k.endsWith("op"))
-    .map(k => {
+    .filter((k) => k.startsWith("testcase") && k.endsWith("op"))
+    .map((k) => {
       const m = k.match(/^testcase(\d+)op$/);
       return m ? parseInt(m[1], 10) : null;
     })
@@ -228,7 +383,7 @@ function UICodeSubmitResultTable({ submitResult }) {
         </tr>
       </thead>
       <tbody>
-        {tcNums.map(idx => {
+        {tcNums.map((idx) => {
           const output = submitResult[`testcase${idx}op`] || "";
           const error = submitResult[`testcase${idx}error`] || "";
           const status = submitResult[`testcase${idx}status`] || "";
@@ -236,17 +391,21 @@ function UICodeSubmitResultTable({ submitResult }) {
             error || status === "error"
               ? error || "Error"
               : status === "success"
-                ? "Passed"
-                : "Failed";
+              ? "Passed"
+              : "Failed";
           const icon =
-            status === "success"
-              ? <span style={{ color: "green", fontWeight: "bold" }}>&#10004;</span>
-              : <span style={{ color: "red", fontWeight: "bold" }}>&#10008;</span>;
+            status === "success" ? (
+              <span style={{ color: "green", fontWeight: "bold" }}>&#10004;</span>
+            ) : (
+              <span style={{ color: "red", fontWeight: "bold" }}>&#10008;</span>
+            );
           return (
             <tr key={idx}>
               <td style={{ textAlign: "center" }}>{icon}</td>
               <td className={styles.cellText}>{`Testcase ${idx}`}</td>
-              <td className={status === "success" ? styles.passed : styles.failed}>{statusText}</td>
+              <td className={status === "success" ? styles.passed : styles.failed}>
+                {statusText}
+              </td>
             </tr>
           );
         })}
