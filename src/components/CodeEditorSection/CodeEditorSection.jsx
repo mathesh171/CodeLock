@@ -168,7 +168,7 @@ const CodeEditorSection = ({
       <div className={styles.editorInnerScroll}>
         <div
           className={styles.editorOuterFixedHeight}
-          style={{ height: editorHeight }}
+          style={{ height: editorHeight, borderRadius: 12, overflow: 'hidden' }}
         >
           <MonacoEditor
             language={

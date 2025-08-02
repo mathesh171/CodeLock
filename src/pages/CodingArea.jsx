@@ -51,73 +51,50 @@ export default function CodingArea() {
   const [statusMap, setStatusMap] = useState({});
   const authUser = getAuthUser();
 
-  // Sync roomCode param to context
+
   useEffect(() => {
     if (roomCodeParam && roomCodeParam !== roomCode) {
       setRoomCode(roomCodeParam);
     }
   }, [roomCodeParam, roomCode, setRoomCode]);
 
-  // Load saved data from localStorage on roomCode change
+
   useEffect(() => {
-    if (!roomCode) return;
+  if (!roomCode) return;
 
-    const savedLang = localStorage.getItem(`lang-${roomCode}`);
-    const savedCurIdx = localStorage.getItem(`curIdx-${roomCode}`);
-    const savedCodes = localStorage.getItem(`codeByQ-${roomCode}`);
-    const savedLangs = localStorage.getItem(`langByQ-${roomCode}`);
-    const savedStatus = localStorage.getItem(`statusMap-${roomCode}`);
+  fetch(`${API_BASE}/api/questions/get/${roomCode}`)
+  .then(res => res.json())
+  .then(data => {
+    if (!data) return;
 
-    if (savedLang) setLang(savedLang);
-    if (savedCurIdx) setCurIdx(Number(savedCurIdx));
-    if (savedCodes) setCodeByQ(JSON.parse(savedCodes));
-    if (savedLangs) setLangByQ(JSON.parse(savedLangs));
-    if (savedStatus) setStatusMap(JSON.parse(savedStatus));
-
-  }, [roomCode]);
-
-  // Fetch questions based on roomCode
-  useEffect(() => {
-    if (!roomCode) return;
-
-    let isMounted = true;
-    fetch(`${API_BASE}/api/questions/get/${roomCode}`)
-      .then(r => {
-        if (!r.ok) throw new Error('Failed to fetch questions');
-        return r.json();
-      })
-      .then(data => {
-        if (!isMounted) return;
-
-        setQuestions(data || []);
-        if (data?.length) {
-          const newCodes = {};
-          const newLangs = {};
-          data.forEach(q => {
-            if (!q.questions_id) return;
-
-            const qid = q.questions_id.id;
-
-            // Use existing lang from langByQ or default
-            const existingLang = langByQ[qid] || lang || 'java';
-            newLangs[qid] = existingLang;
-
-            // Use saved code or initial sample for language
-            newCodes[qid] = codeByQ[qid] || initialCodeSamples[existingLang] || '';
-          });
-
-          setCodeByQ(newCodes);
-          setLangByQ(newLangs);
+    setQuestions(data);
+    // For new questions, only add default entries for those not already existing in langBy/codeBy
+    setLangBy(prev => {
+      const updated = { ...prev };
+      data.forEach(({ questions_id }) => {
+        const qid = questions_id?.id;
+        if (qid && !(qid in updated)) {
+          updated[qid] = 'java'; // Default language for new questions
         }
-      })
-      .catch(() => {
-        setQuestions([]);
       });
+      return updated;
+    });
 
-    return () => { isMounted = false; };
-  }, [roomCode, langByQ, lang, codeByQ]);
+    setCodeBy(prev => {
+      const updated = { ...prev };
+      data.forEach(({ questions_id }) => {
+        const qid = questions_id?.id;
+        if (qid && !(qid in updated)) {
+          updated[qid] = initialCodeSamples['java']; // Default code for new questions
+        }
+      });
+      return updated;
+    });
+  });
+}, [roomCode]);
 
-  // Update status map when questions load
+
+  
   useEffect(() => {
     if (questions.length > 0) {
       setStatusMap(prev => {
@@ -132,12 +109,10 @@ export default function CodingArea() {
     }
   }, [questions]);
 
-  // Persist statusMap to localStorage
   useEffect(() => {
     localStorage.setItem(`statusMap-${roomCode}`, JSON.stringify(statusMap));
   }, [statusMap, roomCode]);
 
-  // Persist codeByQ and langByQ to localStorage
   useEffect(() => {
     if (!roomCode) return;
     localStorage.setItem(`codeByQ-${roomCode}`, JSON.stringify(codeByQ));
@@ -148,7 +123,6 @@ export default function CodingArea() {
     localStorage.setItem(`langByQ-${roomCode}`, JSON.stringify(langByQ));
   }, [langByQ, roomCode]);
 
-  // Persist current lang and curIdx
   useEffect(() => {
     if (!roomCode) return;
     localStorage.setItem(`lang-${roomCode}`, lang);
@@ -159,13 +133,12 @@ export default function CodingArea() {
     localStorage.setItem(`curIdx-${roomCode}`, curIdx);
   }, [curIdx, roomCode]);
 
-  // Clear run and submit results on question change
   useEffect(() => {
     setRunResult(null);
     setSubmitResult(null);
   }, [curIdx]);
 
-  // Sync code with currently selected question & saved code
+
   useEffect(() => {
     if (questions.length === 0) {
       setCode('');
@@ -189,7 +162,6 @@ export default function CodingArea() {
     }
   }, [curIdx, questions, codeByQ, langByQ, lang]);
 
-  // Update status helper
   const updateStatus = (idx, status) => {
     setStatusMap(prev => ({ ...prev, [idx]: status }));
   };
@@ -200,7 +172,6 @@ export default function CodingArea() {
     }
   };
 
-  // Navigation handlers
   const handlePrev = () => {
     markCurrentSkippedIfUnanswered();
     if (curIdx > 0) setCurIdx(curIdx - 1);
@@ -216,7 +187,6 @@ export default function CodingArea() {
     setCurIdx(idx);
   };
 
-  // Run code
   const handleRun = async () => {
     if (!questions[curIdx]?.questions_id) return;
     setLoading(true);
@@ -247,7 +217,6 @@ export default function CodingArea() {
     }
   };
 
-  // Submit code
   const handleSubmit = async () => {
     if (!questions[curIdx]?.questions_id) return;
     setLoading(true);
@@ -281,7 +250,6 @@ export default function CodingArea() {
     }
   };
 
-  // Submit test final action
   const handleFinalSubmit = () => {
     localStorage.removeItem(`statusMap-${roomCode}`);
     fetch(`${API_BASE}/api/submittest`, {
@@ -296,7 +264,6 @@ export default function CodingArea() {
 
   const handleCancelSubmit = () => setShowSubmitModal(false);
 
-  // Clear code for current question
   const handleClear = () => {
     const curQ = questions[curIdx]?.questions_id;
     if (!curQ) return;
@@ -308,7 +275,6 @@ export default function CodingArea() {
     setCode(initialCodeSamples[lang] || '');
   };
 
-  // Handle language change
   const handleLanguageChange = (newLang) => {
     const curQ = questions[curIdx]?.questions_id;
     if (!curQ) return;
@@ -324,7 +290,6 @@ export default function CodingArea() {
     setCode(prev => prev || initialCodeSamples[newLang] || '');
   };
 
-  // Sync code on edit
   const handleCodeChange = (newCode) => {
     const curQ = questions[curIdx]?.questions_id;
     if (!curQ) return;
@@ -335,7 +300,6 @@ export default function CodingArea() {
     }));
   };
 
-  // Extract expected outputs from current question's JSON testcases
   const currentExpectedOutputs = (() => {
     const curQ = questions[curIdx]?.questions_id;
     if (!curQ) return [];
