@@ -51,50 +51,45 @@ export default function CodingArea() {
   const [statusMap, setStatusMap] = useState({});
   const authUser = getAuthUser();
 
-
   useEffect(() => {
     if (roomCodeParam && roomCodeParam !== roomCode) {
       setRoomCode(roomCodeParam);
     }
   }, [roomCodeParam, roomCode, setRoomCode]);
 
-
   useEffect(() => {
-  if (!roomCode) return;
+    if (!roomCode) return;
 
-  fetch(`${API_BASE}/api/questions/get/${roomCode}`)
-  .then(res => res.json())
-  .then(data => {
-    if (!data) return;
+    fetch(`${API_BASE}/api/questions/get/${roomCode}`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data) return;
 
-    setQuestions(data);
-    // For new questions, only add default entries for those not already existing in langBy/codeBy
-    setLangBy(prev => {
-      const updated = { ...prev };
-      data.forEach(({ questions_id }) => {
-        const qid = questions_id?.id;
-        if (qid && !(qid in updated)) {
-          updated[qid] = 'java'; // Default language for new questions
-        }
+        setQuestions(data);
+        setLangByQ(prev => {
+          const updated = { ...prev };
+          data.forEach(({ questions_id }) => {
+            const qid = questions_id?.id;
+            if (qid && !(qid in updated)) {
+              updated[qid] = 'java';
+            }
+          });
+          return updated;
+        });
+
+        setCodeByQ(prev => {
+          const updated = { ...prev };
+          data.forEach(({ questions_id }) => {
+            const qid = questions_id?.id;
+            if (qid && !(qid in updated)) {
+              updated[qid] = initialCodeSamples['java'];
+            }
+          });
+          return updated;
+        });
       });
-      return updated;
-    });
+  }, [roomCode]);
 
-    setCodeBy(prev => {
-      const updated = { ...prev };
-      data.forEach(({ questions_id }) => {
-        const qid = questions_id?.id;
-        if (qid && !(qid in updated)) {
-          updated[qid] = initialCodeSamples['java']; // Default code for new questions
-        }
-      });
-      return updated;
-    });
-  });
-}, [roomCode]);
-
-
-  
   useEffect(() => {
     if (questions.length > 0) {
       setStatusMap(prev => {
@@ -137,7 +132,6 @@ export default function CodingArea() {
     setRunResult(null);
     setSubmitResult(null);
   }, [curIdx]);
-
 
   useEffect(() => {
     if (questions.length === 0) {
@@ -314,7 +308,7 @@ export default function CodingArea() {
 
   return (
     <div className={styles.fixedViewport}>
-      <TopBar username={user?.username || authUser?.username || 'Guest'} roomCode={roomCode} onSubmit={() => setShowSubmitModal(true)} />
+      <TopBar username={user?.username || authUser?.username || 'Guest'} roomCode={roomCode} onSubmitTest={() => setShowSubmitModal(true)} />
 
       {showSubmitModal && (
         <div className={styles.modalOverlay} role="dialog">
